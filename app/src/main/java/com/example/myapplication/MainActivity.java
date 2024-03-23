@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         text1 = findViewById(R.id.text);
         text2 = findViewById(R.id.text1);
 
+        //sendData("ac156788bdcc");
+
     }
 
 
@@ -145,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         comm_data service = retrofit.create(comm_data.class);
 
         Call<String> call = null;
-        call = service.get("Test", data);
+        call = service.post("1jo", data);
 
         final String[] callback = new String[1];
         call.enqueue(new Callback<String>() {
