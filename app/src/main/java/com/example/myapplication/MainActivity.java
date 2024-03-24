@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         comm_data service = retrofit.create(comm_data.class);
 
         Call<String> call = null;
-        call = service.post("1jo", data);
+        call = service.post("1jo, Jewon, seunghwan, chaeun,donggeon, afzal", data);
 
         final String[] callback = new String[1];
         call.enqueue(new Callback<String>() {
