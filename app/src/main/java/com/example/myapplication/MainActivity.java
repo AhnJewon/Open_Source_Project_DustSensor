@@ -91,23 +91,24 @@ public class MainActivity extends AppCompatActivity {
 
             //text1.setText("암호획득");
 
-            if(MacAdd.equals("B8:27:EB:7F:E7:58")){
+            //c: mac주소를 3번 라즈베리파이 맥으로 바꾸기
+            if(MacAdd.equals("B8:27:EB:DA:F2:5B")){
                 Log.i("MAC", MacAdd);
                 blead.stopLeScan(scancallback_le);
 
                 text1.setText("암호획득");
                 text2.setText(data);
 
-                while(sendData(data) == "fail"){
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-
-
-                }
+//                while(sendData(data) == "fail"){
+//
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//
+//
+//                }
 
             }
 
@@ -122,15 +123,47 @@ public class MainActivity extends AppCompatActivity {
             sb.append(String.format("%02x", b));
 
         String pass = sb.toString();
+        Log.i("Pass", pass);
 
-        int index = pass.indexOf("998899");
-        if(index != -1) {
-            pass = pass.substring(index + 6);
-            index = pass.indexOf("998899");
-            pass = pass.substring(0, index);
-            Log.i("password", pass);
+        String TimeOTP, sensingtime, sensorone, sensortwo, sensorthree;
+
+        int index_t = pass.indexOf("f0f0");
+        if(index_t != -1) {
+            pass = pass.substring(index_t + 4);
+            TimeOTP = pass.substring(0, 6);
+            Log.i("TimeOTP", TimeOTP);
         }
 
+
+        int index_s = pass.indexOf("9999");
+        if(index_s != -1) {
+            pass = pass.substring(index_s+4);
+            sensingtime = pass.substring(0, 10);
+            Log.i("SensingTime", sensingtime);
+        }
+
+        int index_d = pass.indexOf("fd");
+        if(index_d != -1) {
+            pass = pass.substring(index_d+2);
+            sensorone = pass.substring(0, 2);
+            sensortwo = pass.substring(2, 4);
+            sensorthree = pass.substring(4, 6);
+            Log.i("SensorOne", sensorone);
+            Log.i("SensorTwo", sensortwo);
+            Log.i("SensorThree", sensorthree);
+        }
+
+
+
+
+
+//        int index = pass.indexOf("998899");
+//        if(index != -1) {
+//            pass = pass.substring(index + 6);
+//            index = pass.indexOf("998899");
+//            pass = pass.substring(0, index);
+//            Log.i("password", pass);
+//        }
         return pass;
     }
 
