@@ -8,15 +8,28 @@ import com.google.gson.annotations.SerializedName;
 public class postdata {
 
     @Expose
-    @SerializedName("user") private String user;
+    //@SerializedName("user") private String user;
+   // @SerializedName("data") private String data;
+
+    @SerializedName("sensor") private String sensor;
+    @SerializedName("mac") private String mac;
+    @SerializedName("receiver") private String receiver;
+
+    @SerializedName("time") private String time;
+    @SerializedName("otp") private String otp;
     @SerializedName("data") private String data;
 
-    public void set_data(String user, String data) {
-        this.user = user;
+
+    public void set_data(String sensor, String mac, String receiver, String time, String otp, String data) {
+        this.sensor = sensor;
+        this.mac = mac;
+        this.receiver = receiver;
+        this.time = time;
+        this.otp = otp;
         this.data = data;
     }
 
-    public void data_show(){Log.e("test", user + data);}
+    public void data_show(){Log.e("test", sensor + data);}
 
     public String get_data() {
     return data;

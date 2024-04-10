@@ -17,7 +17,7 @@ public interface comm_data {
             @Field("data") String data
     );
 
-    @POST("dustsensor/commtest_json/")
+    @POST("dustsensor/sensing/")
     Call<postdata> post_json(
             @Body postdata pd
     );
