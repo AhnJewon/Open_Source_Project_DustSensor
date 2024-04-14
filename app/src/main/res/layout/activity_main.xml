@@ -11,22 +11,9 @@
     <!--        android:layout_width="match_parent"-->
     <!--        android:layout_height="100dp"-->
     <!--        android:id="@+id/bt"/>-->
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="256dp"
-        android:layout_height="105dp"
-        android:gravity="center"
-        android:textAlignment="center"
-        android:text=" "
-        android:textSize="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/text1"
+        android:id="@+id/text"
         android:layout_width="256dp"
         android:layout_height="105dp"
         android:gravity="center"
@@ -38,6 +25,21 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.707" />
+        app:layout_constraintVertical_bias="0.325" />
+
+    <TextView
+        android:id="@+id/text1"
+        android:layout_width="267dp"
+        android:layout_height="280dp"
+        android:gravity="center"
+        android:text=" "
+        android:textAlignment="center"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.735" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
