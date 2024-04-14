@@ -8,9 +8,11 @@ import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -24,7 +26,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.Locale;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,45 +45,134 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 public class MainActivity extends AppCompatActivity {
     BluetoothAdapter blead = BluetoothAdapter.getDefaultAdapter();
 
+    ArrayList<BLEdata_storage> datalist = new ArrayList<BLEdata_storage>();
     private Retrofit retrofit;
-    private TextView text1, text2;
+    private TextView tv;
+    private int[] numofdata;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-//            return insets;
-//        });
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        TextView tv = findViewById(R.id.tv);
+        Button bt_ble = findViewById(R.id.bt_blestart);
+        Button bt_write = findViewById(R.id.bt_write);
+        Button bt_store = findViewById(R.id.bt_store);
+        Button bt_show = findViewById(R.id.bt_show);
+
+        EditText ed_rssi = findViewById(R.id.ed_rssi);
+        EditText ed_pm1_0 = findViewById(R.id.ed_pm1_0);
+        EditText ed_pm25 = findViewById(R.id.ed_pm2_5);
+        EditText ed_pm10 = findViewById(R.id.ed_pm10);
+
+        BluetoothAdapter blead = BluetoothAdapter.getDefaultAdapter();
+
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
+        }
+        if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
+        }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
+        }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1000);
+        }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, 1000);
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 1000);
         }
 
-
         if (!blead.isEnabled())
             blead.enable();
-        //Log.e("ble", String.valueOf(blead.isEnabled()));
-        //Log.e("ble", String.valueOf(blead));
-//        Button bt = findViewById(R.id.bt);
-//        bt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-        blead.startLeScan(scancallback_le);
 
-        text1 = findViewById(R.id.text);
-        text2 = findViewById(R.id.text1);
 
-        //sendData("ac156788bdcc");
+
+        bt_ble.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                blead.startLeScan(scancallback_le);
+            }
+        });
+
+        bt_write.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int rssi = Integer.valueOf(ed_rssi.getText().toString());
+                int pm1_0 = Integer.valueOf(ed_pm1_0.getText().toString());
+                int pm2_5 = Integer.valueOf(ed_pm25.getText().toString());
+                int pm10 = Integer.valueOf(ed_pm10.getText().toString());
+
+                BLEdata_storage data = new BLEdata_storage(rssi, pm1_0,pm2_5, pm10, System.currentTimeMillis());
+
+                datalist.add(data);
+            }
+        });
+
+        bt_store.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                try {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+
+
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    for (int j = 0; j < datalist.size(); j++) {
+
+                        bw.write(String.valueOf(datalist.get(j).get_rssi()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_p01()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_p25()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_p10()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_time()));
+
+                        bw.newLine();
+                    }
+
+
+                    bw.close();
+                    fw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+                datalist.clear();
+
+
+            }
+        });
+
+        bt_show.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try {
+                    tv.setText("");
+                    String line;
+                    BufferedReader br = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv"));
+                    while((line = br.readLine())!= null) {
+                        tv.setText(tv.getText()+line+"\n");
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        });
+
 
     }
 
@@ -97,19 +194,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("MAC", MacAdd);
                 blead.stopLeScan(scancallback_le);
 
-                text1.setText("암호획득");
-                text2.setText(data);
-
-                while(sendData(data) == "fail"){
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-
-
-                }
+//                while(sendData(data) == "fail"){
+//
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//
+//
+//                }
 
             }
 
@@ -124,80 +218,14 @@ public class MainActivity extends AppCompatActivity {
             sb.append(String.format("%02x", b));
 
         String pass = sb.toString();
-        Log.i("Pass", pass);
 
-        //바뀐 부분 127~182번줄
-        //timeotp, sensingtime, sensordata는 NULL이 아니게 설정해야 join할 때 오류 안남
-        String timeotp="", sensingtime="", sensorone, sensortwo, sensorthree, sensordata="";
-
-        int index = pass.indexOf("f0f0");
+        int index = pass.indexOf("998899");
         if(index != -1) {
-            pass = pass.substring(index + 4);
-            //TimeOTP = pass.substring(0, 6);
-            //bool을 1로 해서 0 없이 나오게 하기 (%d)
-            timeotp = hexToDec(pass.substring(0, 6),1);
-            Log.i("TimeOTP", timeotp);
+            pass = pass.substring(index + 6);
+            index = pass.indexOf("998899");
+            pass = pass.substring(0, index);
+            Log.i("password", pass);
         }
-
-
-        index = pass.indexOf("9999");
-        if(index != -1) {
-            pass = pass.substring(index+4);
-            //sensingtime = pass.substring(0, 10);
-            //bool을 0으로 해서 앞에 0 붙여서 나오게 하기 (%02d)
-            sensingtime = hexToDec(pass.substring(0,10),0);
-            Log.i("SensingTime", sensingtime);
-        }
-
-
-        index = pass.indexOf("fd");
-        if(index != -1) {
-            pass = pass.substring(index+2);
-            //sensorone = pass.substring(0, 2);
-            //sensortwo = pass.substring(2, 4);
-            //sensorthree = pass.substring(4, 6);
-            //bool을 1로 해서 0 없이 나오게 하기 (%d)
-            sensorone = hexToDec(pass.substring(0,2),1);
-            sensortwo = hexToDec(pass.substring(2,4),1);
-            sensorthree = hexToDec(pass.substring(4,6),1);
-            //join으로 /넣어서 합치기
-            sensordata = String.join("/", sensorone, sensortwo, sensorthree);
-
-            Log.i("SensorOne", sensorone);
-            Log.i("SensorTwo", sensortwo);
-            Log.i("SensorThree", sensorthree);
-            Log.i("sensordata: ", sensordata);
-        }
-
-//        int index = pass.indexOf("998899");
-//        if(index != -1) {
-//            pass = pass.substring(index + 6);
-//            index = pass.indexOf("998899");
-//            pass = pass.substring(0, index);
-//            Log.i("password", pass);
-//        }
-
-        //,로 join
-        pass = String.join(", ", timeotp, sensingtime, sensordata);
-
-        return pass;
-    }
-
-
-
-
-    private String hexToDec(String scanRecord, int bool){
-        StringBuilder sb = new StringBuilder(scanRecord.length() * 2);
-
-        for(int i = 0; i<scanRecord.length(); i+=2){
-            String hex = scanRecord.substring(i,i+2);
-            int decimal = Integer.parseInt(hex,16);
-
-            if(bool == 1) sb.append(String.format(Locale.US, "%d", decimal));
-            else sb.append(String.format(Locale.US, "%02d", decimal));
-        }
-
-        String pass = sb.toString();
 
         return pass;
     }
@@ -215,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         comm_data service = retrofit.create(comm_data.class);
 
         Call<String> call = null;
-        call = service.post("1jo, Jewon, seunghwan, chaeun,donggeon, afzal", data);
+        call = service.post("1jo", data);
 
         final String[] callback = new String[1];
         call.enqueue(new Callback<String>() {
