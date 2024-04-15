@@ -11,9 +11,13 @@ import retrofit2.http.Query;
 public interface comm_data {
 
     @FormUrlEncoded
-    @POST("dustsensor/commtest/")
+    @POST("dustsensor/sensing/")
     Call<String> post(
-            @Field("user") String user,
+            @Field("sensor") String sensor,
+            @Field("mac") String mac,
+            @Field("receiver") String receiver,
+            @Field("time") String time,
+            @Field("otp") String otp,
             @Field("data") String data
     );
 
@@ -24,7 +28,11 @@ public interface comm_data {
 
     @GET("dustsensor/commtest_get/")
     Call<String> get(
-            @Query("user") String user,
+            @Query("sensor") String sensor,
+            @Query("mac") String mac,
+            @Query("receiver") String receiver,
+            @Query("time") int time,
+            @Query("otp") int otp,
             @Query("data") String data
     );
 
