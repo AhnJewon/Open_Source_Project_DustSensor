@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             //text1.setText("암호획득");
 
             if (mac1jo.contains(MacAdd) || mac2jo.contains(MacAdd) || mac3jo.contains(MacAdd) ||
-                    mac4jo.contains(MacAdd) || mac5jo.contains(MacAdd)) {
+                    mac4jo.contains(MacAdd) || mac5jo.contains(MacAdd) || MacAdd.equals("B8:27:EB:7F:E7:58")) {
                 Log.i("MAC", MacAdd);
                 blead.stopLeScan(scancallback_le);
                 sw_bt.setChecked(false);
@@ -256,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
                     sensor = "4jo";
                 } else if (mac5jo.contains(MacAdd)) {
                     sensor = "5jo";
+                } else if (MacAdd.equals("B8:27:EB:7F:E7:58")) {
+                    sensor = "ta";
                 }
 
                 postdata.set_data(sensor, MacAdd, "1jo",
@@ -333,13 +335,6 @@ public class MainActivity extends AppCompatActivity {
             Log.i("sensordata: ", sensordata);
         }
 
-//        int index = pass.indexOf("998899");
-//        if(index != -1) {
-//            pass = pass.substring(index + 6);
-//            index = pass.indexOf("998899");
-//            pass = pass.substring(0, index);
-//            Log.i("password", pass);
-//        }
 
         //,로 join
         pass = String.join(",", timeotp, sensingtime, sensordata);
@@ -378,7 +373,6 @@ public class MainActivity extends AppCompatActivity {
 
         Call<String> call = null;
         call = service.post(postjson.sensor, postjson.mac, postjson.receiver, postjson.time, postjson.otp, postjson.data);
-        //call = service.post("1jo", "D8:3A:DD:42:AC:64", "1jo","1713166634", "116", "0/11/9");
 
         final String[] callback = new String[1];
         call.enqueue(new Callback<String>() {
@@ -394,8 +388,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
-        //Boolean ch = callback[0].contains("correct");
 
 
         return true;
