@@ -1,33 +1,49 @@
 package com.example.myapplication;
 
 public class BLEdata_storage {
-    private int RSSI;
-    private int p01;
-    private int p25;
-    private int p10;
-    private long time;
+    private String sens;
+    private String mac;
+    private int time;
+    private int otp;
+    private String rcv;
+    private String p01;
+    private String p25;
+    private String p10;
 
-    BLEdata_storage(int RSSI, int p01, int p25, int p10, long time){
-        this.RSSI = RSSI;
+
+    BLEdata_storage(String sens, String mac, int time, int otp, String rcv, String p01, String p25, String p10){
+        this.sens = sens;
+        this.mac = mac;
+        this.rcv = rcv;
         this.p01 = p01;
         this.p25 = p25;
         this.p10 = p10;
         this.time = time;
+        this.otp = otp;
     }
-    public int get_rssi(){
-        return RSSI;
+    public String get_rcv(){
+        return rcv;
     }
-    public int get_p01(){
+    public String get_p01(){
         return p01;
     }
-    public int get_p25(){
+    public String get_p25(){
         return p25;
     }
-    public int get_p10(){
+    public String get_p10(){
         return p10;
     }
-    public long get_time(){
+    public int get_time(){
         return time;
+    }
+    public String get_mac(){
+        return mac;
+    }
+    public String get_sens(){
+        return sens;
+    }
+    public int get_otp(){
+        return otp;
     }
 }
 
