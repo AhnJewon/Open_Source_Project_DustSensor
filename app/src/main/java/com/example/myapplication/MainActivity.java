@@ -17,6 +17,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+import android.media.AudioAttributes;
+import android.media.SoundPool;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText ed_pm1_0;
     private EditText ed_pm25;
     private EditText ed_pm10;
+    private SoundPool soundPool;
+    private int soundID;
     private int[] numofdata;
 
     public postdata postdata = new postdata();
@@ -74,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     List<String> mac5jo = new ArrayList<>(Arrays.asList("B8:27:EB:47:8D:50", "B8:27:EB:D3:40:06",
             "B8:27:EB:E4:D0:FC", "B8:27:EB:57:71:7D"));
 
+
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         Button bt_show = findViewById(R.id.bt_show);
 
         Button bt_store = findViewById(R.id.bt_store);
+        Button bt_delet = findViewById(R.id.bt_delet);
 
         sw_bt = findViewById(R.id.sw_bt);
         ed_sens = findViewById(R.id.ed_sens);
@@ -125,15 +133,18 @@ public class MainActivity extends AppCompatActivity {
             blead.enable();
         blead.startLeScan(scancallback_le);
 
-//        sw_bt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                sw_bt.setChecked(true);
-//                blead.startLeScan(scancallback_le);
-//            }
-//        });
 
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
 
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        soundID = soundPool.load(this, R.raw.success, 1);
 
         bt_store.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
                     BufferedWriter bw = new BufferedWriter(fw);
 
                     for (int j = 0; j < datalist.size(); j++) {
@@ -177,6 +188,33 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        bt_delet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                try {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+
+
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    bw.write("");
+
+                    bw.close();
+                    fw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+
+            }
+                                    });
 
         bt_show.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter.LeScanCallback scancallback_le = new BluetoothAdapter.LeScanCallback() {
 
 
+
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             Log.i("ble", "스캔됨");
@@ -243,6 +282,9 @@ public class MainActivity extends AppCompatActivity {
             if (mac1jo.contains(MacAdd) || mac2jo.contains(MacAdd) || mac3jo.contains(MacAdd) ||
                     mac4jo.contains(MacAdd) || mac5jo.contains(MacAdd) || MacAdd.equals("B8:27:EB:7F:E7:58")) {
                 Log.i("MAC", MacAdd);
+
+                soundPool.play(soundID, 1, 1, 0, 0, 1);
+
                 blead.stopLeScan(scancallback_le);
                 sw_bt.setChecked(false);
 
@@ -278,11 +320,22 @@ public class MainActivity extends AppCompatActivity {
 
                 sendData(postdata);
 
+
+
             }
 
 
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+        }
+    }
 
     private String bytearrayToHex(byte[] scanRecord) {
         StringBuilder sb = new StringBuilder(scanRecord.length * 2);
