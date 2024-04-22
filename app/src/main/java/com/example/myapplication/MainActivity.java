@@ -317,6 +317,11 @@ public class MainActivity extends AppCompatActivity {
                 BLEdata_storage ble = new BLEdata_storage(sensor, MacAdd, Integer.parseInt(datasplit[1]), Integer.parseInt(datasplit[0]), "1jo", pm[0],pm[1],pm[2]);
 
                 datalist.add(ble);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
                 sendData(postdata);
 
