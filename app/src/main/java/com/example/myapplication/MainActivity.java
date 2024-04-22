@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import android.media.AudioAttributes;
 import android.media.SoundPool;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -313,6 +315,49 @@ public class MainActivity extends AppCompatActivity {
                 ed_pm1_0.setText(pm[0]);
                 ed_pm25.setText(pm[1]);
                 ed_pm10.setText(pm[2]);
+
+                //여기부터 토스트메시지+ 색상바꾸기 코드
+                int intTwo = Integer.parseInt(pm[1]);
+                int intThree = Integer.parseInt(pm[2]);
+                String text1, text2;
+
+                //초미세먼지 색 바꾸기, 토스트메시지 띄우기
+                if(intTwo>=0 &&intTwo<=15) {
+                    ed_pm25.setTextColor(Color.parseColor("#549FF8"));
+                    text1 = "초미세먼지 좋음";
+                }
+                else if(intTwo<=35) {
+                    ed_pm25.setTextColor(Color.parseColor("#52C148"));
+                    text1 = "초미세먼지 보통";
+                }
+                else if(intTwo<=75) {
+                    ed_pm25.setTextColor(Color.parseColor("#EE9D62"));
+                    text1 = "초미세먼지 나쁨";
+                }
+                else {
+                    ed_pm25.setTextColor(Color.parseColor("#EC655F"));
+                    text1 = "초미세먼지 매우 나쁨";
+                }
+
+                //미세먼지 색 바꾸기, 토스트메시지 띄우기
+                if(intThree>=0 && intThree<=30) {
+                    ed_pm10.setTextColor(Color.parseColor("#549FF8"));
+                    text2 = "미세먼지 좋음";
+                }
+                else if(intThree<=80) {
+                    ed_pm10.setTextColor(Color.parseColor("#52C148"));
+                    text2 = "미세먼지 보통";
+                }
+                else if(intThree<=150) {
+                    ed_pm10.setTextColor(Color.parseColor("#EE9D62"));
+                    text2 = "미세먼지 나쁨";
+                }
+                else {
+                    ed_pm25.setTextColor(Color.parseColor("#EC655F"));
+                    text2 = "미세먼지 매우 나쁨";
+                }
+
+                Toast.makeText(getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
 
                 BLEdata_storage ble = new BLEdata_storage(sensor, MacAdd, Integer.parseInt(datasplit[1]), Integer.parseInt(datasplit[0]), "1jo", pm[0],pm[1],pm[2]);
 
