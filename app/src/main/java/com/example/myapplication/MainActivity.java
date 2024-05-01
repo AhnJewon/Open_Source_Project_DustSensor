@@ -5,7 +5,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText ed_pm10;
     private SoundPool soundPool;
     private int soundID;
-    private boolean soundLoaded = false;
+    private int[] numofdata;
 
     public postdata postdata = new postdata();
 
@@ -76,11 +75,12 @@ public class MainActivity extends AppCompatActivity {
     List<String> mac2jo = new ArrayList<>(Arrays.asList("D8:3A:DD:79:8F:97", "D8:3A:DD:79:8F:B9",
             "D8:3A:DD:79:8F:54", "D8:3A:DD:79:8F:80"));
     List<String> mac3jo = new ArrayList<>(Arrays.asList("D8:3A:DD:79:8E:D9", "D8:3A:DD:42:AC:9A",
-            "D8:3A:DD:42:A8:FB", "D8:3A:DD:79:8E:9B"));
+            "D8:3A:DD:42:AB:FB", "D8:3A:DD:79:8E:9B"));
     List<String> mac4jo = new ArrayList<>(Arrays.asList("D8:3A:DD:78:A7:1A", "D8:3A:DD:79:8E:BF",
             "D8:3A:DD:79:8E:92", "D8:3A:DD:79:8F:59"));
     List<String> mac5jo = new ArrayList<>(Arrays.asList("B8:27:EB:47:8D:50", "B8:27:EB:D3:40:06",
             "B8:27:EB:E4:D0:FC", "B8:27:EB:57:71:7D"));
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -90,23 +90,11 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        //성공 효과음 설정
-        AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_GAME)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build();
-
-        soundPool = new SoundPool.Builder()
-                .setMaxStreams(1)
-                .setAudioAttributes(audioAttributes)
-                .build();
-
-        soundID = soundPool.load(this, R.raw.iponenew, 1);
-
         TextView tv = findViewById(R.id.tv);
         Button bt_show = findViewById(R.id.bt_show);
 
         Button bt_store = findViewById(R.id.bt_store);
+        Button bt_delet = findViewById(R.id.bt_delet);
 
         sw_bt = findViewById(R.id.sw_bt);
         ed_sens = findViewById(R.id.ed_sens);
@@ -147,15 +135,18 @@ public class MainActivity extends AppCompatActivity {
             blead.enable();
         blead.startLeScan(scancallback_le);
 
-//        sw_bt.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                sw_bt.setChecked(true);
-//                blead.startLeScan(scancallback_le);
-//            }
-//        });
 
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
 
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(audioAttributes)
+                .build();
+
+        soundID = soundPool.load(this, R.raw.iponenew, 1);
 
         bt_store.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
                     BufferedWriter bw = new BufferedWriter(fw);
 
                     for (int j = 0; j < datalist.size(); j++) {
@@ -199,6 +190,33 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        bt_delet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                try {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+
+
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    bw.write("");
+
+                    bw.close();
+                    fw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+
+            }
+                                    });
 
         bt_show.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter.LeScanCallback scancallback_le = new BluetoothAdapter.LeScanCallback() {
 
 
+
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             Log.i("ble", "스캔됨");
@@ -265,11 +284,11 @@ public class MainActivity extends AppCompatActivity {
             if (mac1jo.contains(MacAdd) || mac2jo.contains(MacAdd) || mac3jo.contains(MacAdd) ||
                     mac4jo.contains(MacAdd) || mac5jo.contains(MacAdd) || MacAdd.equals("B8:27:EB:7F:E7:58")) {
                 Log.i("MAC", MacAdd);
-                //여기에 효과음
+
                 soundPool.play(soundID, 1, 1, 0, 0, 1);
 
-                blead.stopLeScan(scancallback_le);
-                sw_bt.setChecked(false);
+                //blead.stopLeScan(scancallback_le);
+                //sw_bt.setChecked(false);
 
                 if (mac1jo.contains(MacAdd)) {
                     sensor = "1jo";
@@ -281,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                     sensor = "4jo";
                 } else if (mac5jo.contains(MacAdd)) {
                     sensor = "5jo";
-                } else if(MacAdd.equals("B8:27:EB:7F:E7:58")){
+                } else if (MacAdd.equals("B8:27:EB:7F:E7:58")) {
                     sensor = "ta";
                 }
 
@@ -296,8 +315,6 @@ public class MainActivity extends AppCompatActivity {
                 ed_pm1_0.setText(pm[0]);
                 ed_pm25.setText(pm[1]);
                 ed_pm10.setText(pm[2]);
-
-
 
                 //여기부터 토스트메시지+ 색상바꾸기 코드
                 int intTwo = Integer.parseInt(pm[1]);
@@ -342,12 +359,18 @@ public class MainActivity extends AppCompatActivity {
 
                 Toast.makeText(getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
 
-
                 BLEdata_storage ble = new BLEdata_storage(sensor, MacAdd, Integer.parseInt(datasplit[1]), Integer.parseInt(datasplit[0]), "1jo", pm[0],pm[1],pm[2]);
 
                 datalist.add(ble);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
                 sendData(postdata);
+
+
 
             }
 
@@ -413,17 +436,8 @@ public class MainActivity extends AppCompatActivity {
             Log.i("SensorTwo", sensortwo);
             Log.i("SensorThree", sensorthree);
             Log.i("sensordata: ", sensordata);
-
-
         }
 
-//        int index = pass.indexOf("998899");
-//        if(index != -1) {
-//            pass = pass.substring(index + 6);
-//            index = pass.indexOf("998899");
-//            pass = pass.substring(0, index);
-//            Log.i("password", pass);
-//        }
 
         //,로 join
         pass = String.join(",", timeotp, sensingtime, sensordata);
@@ -448,9 +462,6 @@ public class MainActivity extends AppCompatActivity {
         return pass;
     }
 
-
-
-
     private Boolean sendData(postdata postjson) {
 
         Gson gson = new GsonBuilder().setLenient().create();
@@ -465,7 +476,6 @@ public class MainActivity extends AppCompatActivity {
 
         Call<String> call = null;
         call = service.post(postjson.sensor, postjson.mac, postjson.receiver, postjson.time, postjson.otp, postjson.data);
-        //call = service.post("1jo", "D8:3A:DD:42:AC:64", "1jo","1713166634", "116", "0/11/9");
 
         final String[] callback = new String[1];
         call.enqueue(new Callback<String>() {
@@ -481,8 +491,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
-        //Boolean ch = callback[0].contains("correct");
 
 
         return true;
