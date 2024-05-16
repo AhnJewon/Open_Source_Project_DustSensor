@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -30,7 +33,7 @@ import java.util.jar.Manifest;
 public class ConnectionFragment extends Fragment {
 
     String TAG = "MainActivity";
-    UUID BT_MOUDULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     TextView textStatus;
     Button btnParied, btnSearch, btnSend;
@@ -53,11 +56,6 @@ public class ConnectionFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mainActivity = null;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,7 @@ public class ConnectionFragment extends Fragment {
         deviceAddressArray = new ArrayList<>();
         listView.setAdapter(btArrayAdapter);
 
-
+        listView.setOnItemClickListener(new myOnItemClickListener());
 
         return rootView;
     }
@@ -99,5 +97,80 @@ public class ConnectionFragment extends Fragment {
 
     }
 
+    public void onClickButtonPaired(View view){
+
+        btArrayAdapter.clear();
+        if(deviceAddressArray!=null && !deviceAddressArray.isEmpty()){ deviceAddressArray.clear(); }
+        pairedDevices = btAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress(); // MAC address
+                btArrayAdapter.add(deviceName);
+                deviceAddressArray.add(deviceHardwareAddress);
+
+            }
+        }
+
+    }
+
+
+    // Send string "a"
+    public void onClickButtonSend(View view){
+        if(connectedThread!=null){ connectedThread.write("a"); }
+    }
+
+    // Create a BroadcastReceiver for ACTION_FOUND.
+
+    public class myOnItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(mainActivity.getApplicationContext(), btArrayAdapter.getItem(position), Toast.LENGTH_SHORT).show();
+
+            textStatus.setText("try...");
+
+            final String name = btArrayAdapter.getItem(position); // get name
+            final String address = deviceAddressArray.get(position); // get address
+            boolean flag = true;
+
+            BluetoothDevice device = btAdapter.getRemoteDevice(address);
+
+            // create & connect socket
+            try {
+                btSocket = createBluetoothSocket(device);
+            } catch (IOException e) {
+                textStatus.setText("connection failed!");
+                e.printStackTrace();
+            }
+
+            try {
+                btSocket.connect();
+            } catch (IOException e) {
+                try {
+                    btSocket.close();
+                } catch (IOException e2) {
+                    Log.e(TAG, "unable to close() socket during connection failure", e2);
+                }
+            }
+            // start bluetooth communication
+            connectedThread = new ConnectedThread(btSocket);
+            textStatus.setText("connected to" + name);
+            connectedThread.start();
+        }
+
+
+    }
+
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+        try {
+            final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
+            return (BluetoothSocket) m.invoke(device, BT_MODULE_UUID);
+        } catch (Exception e) {
+            Log.e(TAG, "Could not create Insecure RFComm Connection",e);
+        }
+        return  device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
+    }
 
 }

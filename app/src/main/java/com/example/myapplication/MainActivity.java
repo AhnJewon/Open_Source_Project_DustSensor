@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-
+import android.widget.AdapterView;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.widget.Toast;
@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter.LeScanCallback scancallback_le = new BluetoothAdapter.LeScanCallback() {
 
 
-
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
             Log.i("ble", "스캔됨");
@@ -213,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 postdata.set_data(sensor, MacAdd, "1jo",
-                       datasplit[1], datasplit[0], datasplit[2]);
+                        datasplit[1], datasplit[0], datasplit[2]);
                 String pm[] = datasplit[2].split("/");
                 ed_sens.setText(sensor);
                 ed_mac.setText(MacAdd);
@@ -230,44 +229,38 @@ public class MainActivity extends AppCompatActivity {
                 String text1, text2;
 
                 //초미세먼지 색 바꾸기, 토스트메시지 띄우기
-                if(intTwo>=0 &&intTwo<=15) {
+                if (intTwo >= 0 && intTwo <= 15) {
                     ed_pm25.setTextColor(Color.parseColor("#549FF8"));
                     text1 = "초미세먼지 좋음";
-                }
-                else if(intTwo<=35) {
+                } else if (intTwo <= 35) {
                     ed_pm25.setTextColor(Color.parseColor("#52C148"));
                     text1 = "초미세먼지 보통";
-                }
-                else if(intTwo<=75) {
+                } else if (intTwo <= 75) {
                     ed_pm25.setTextColor(Color.parseColor("#EE9D62"));
                     text1 = "초미세먼지 나쁨";
-                }
-                else {
+                } else {
                     ed_pm25.setTextColor(Color.parseColor("#EC655F"));
                     text1 = "초미세먼지 매우 나쁨";
                 }
 
                 //미세먼지 색 바꾸기, 토스트메시지 띄우기
-                if(intThree>=0 && intThree<=30) {
+                if (intThree >= 0 && intThree <= 30) {
                     ed_pm10.setTextColor(Color.parseColor("#549FF8"));
                     text2 = "미세먼지 좋음";
-                }
-                else if(intThree<=80) {
+                } else if (intThree <= 80) {
                     ed_pm10.setTextColor(Color.parseColor("#52C148"));
                     text2 = "미세먼지 보통";
-                }
-                else if(intThree<=150) {
+                } else if (intThree <= 150) {
                     ed_pm10.setTextColor(Color.parseColor("#EE9D62"));
                     text2 = "미세먼지 나쁨";
-                }
-                else {
+                } else {
                     ed_pm25.setTextColor(Color.parseColor("#EC655F"));
                     text2 = "미세먼지 매우 나쁨";
                 }
 
                 Toast.makeText(getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
 
-                BLEdata_storage ble = new BLEdata_storage(sensor, MacAdd, Integer.parseInt(datasplit[1]), Integer.parseInt(datasplit[0]), "1jo", pm[0],pm[1],pm[2]);
+                BLEdata_storage ble = new BLEdata_storage(sensor, MacAdd, Integer.parseInt(datasplit[1]), Integer.parseInt(datasplit[0]), "1jo", pm[0], pm[1], pm[2]);
 
                 datalist.add(ble);
 
@@ -280,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
                 sendData(postdata);
 
 
-
             }
 
 
@@ -288,8 +280,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private class ZoomOutTransformer implements ViewPager2.PageTransformer {
-        private static final float MIN_SCALE=0.85f;
-        private static final float MIN_ALPHA=0.5f;
+        private static final float MIN_SCALE = 0.85f;
+        private static final float MIN_ALPHA = 0.5f;
 
         @Override
         public void transformPage(@NonNull View page, float position) {
@@ -299,13 +291,13 @@ public class MainActivity extends AppCompatActivity {
                 page.setAlpha(0f);
             } else if (position <= 1) {     // [-1, 1]
                 float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
-                float vertMargin = pageHeight * (1-scaleFactor) / 2;
-                float horzMargin = pageWidth * (1-scaleFactor) / 2;
+                float vertMargin = pageHeight * (1 - scaleFactor) / 2;
+                float horzMargin = pageWidth * (1 - scaleFactor) / 2;
 
                 if (position < 0) {
-                    page.setTranslationX(horzMargin - vertMargin/2);
+                    page.setTranslationX(horzMargin - vertMargin / 2);
                 } else {
-                    page.setTranslationX(-horzMargin + vertMargin/2);
+                    page.setTranslationX(-horzMargin + vertMargin / 2);
                 }
                 page.setScaleX(scaleFactor);
                 page.setScaleY(scaleFactor);
@@ -435,19 +427,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public void setSwitch(Switch sw){
+    public void setSwitch(Switch sw) {
         sw_bt = sw;
 
-        sw_bt.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+        sw_bt.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
 
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
+                if (isChecked == true) {
                     sw_bt.setChecked(true);
                     blead.startLeScan(scancallback_le);
                     sw_bt.setText("블루투스 스캔중");
-                }
-                else {
+                } else {
                     sw_bt.setChecked(false);
                     blead.stopLeScan(scancallback_le);
                     sw_bt.setText("블루투스 스캔 종료");
@@ -456,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setBtShow(Button bt){
+    public void setBtShow(Button bt) {
         bt_show = bt;
         bt_show.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -477,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setBtStore(Button bt){
+    public void setBtStore(Button bt) {
         bt_store = bt;
         bt_store.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -516,7 +507,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void setBtDelet(Button bt){
+    public void setBtDelet(Button bt) {
         bt_delet = bt;
         bt_delet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -543,13 +534,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setText(TextView tev, EditText sens, EditText mac, EditText time, EditText otp, EditText rcv,
-                        EditText pm01, EditText pm25, EditText pm10){
+                        EditText pm01, EditText pm25, EditText pm10) {
         tv = tev;
-        ed_sens = sens; ed_mac = mac; ed_time = time; ed_otp = otp; ed_rcv = rcv;
-        ed_pm0_1 = pm01; ed_pm25 = pm25; ed_pm10 = pm10;
+        ed_sens = sens;
+        ed_mac = mac;
+        ed_time = time;
+        ed_otp = otp;
+        ed_rcv = rcv;
+        ed_pm0_1 = pm01;
+        ed_pm25 = pm25;
+        ed_pm10 = pm10;
     }
-
-    public void setListView(ListView listView){
-        listView.setOnItemClickListener(new myOnItemClickListener());    }
-
 }
+
+
