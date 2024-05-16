@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -23,9 +24,15 @@ import android.media.SoundPool;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.myapplication.databinding.ActivityMainBinding;
+import com.example.myapplication.databinding.SensingLayoutBinding;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -56,18 +63,30 @@ public class MainActivity extends AppCompatActivity {
     private Retrofit retrofit;
     private TextView tv;
     private Switch sw_bt;
+    private Button bt_show;
+    private Button bt_store;
+    private Button bt_delet;
+    private TabLayout tab;
     private EditText ed_sens;
     private EditText ed_mac;
     private EditText ed_time;
     private EditText ed_otp;
     private EditText ed_rcv;
-    private EditText ed_pm1_0;
+    private EditText ed_pm0_1;
     private EditText ed_pm25;
     private EditText ed_pm10;
+
+    private TextView textStatus;
+    private Button btnParied, btnSearch, btnSend;
+    private ListView listView;
     private SoundPool soundPool;
     private int soundID;
     private int[] numofdata;
+    private ActivityMainBinding ma_binding;
+    private SensingLayoutBinding se_binding;
+    private ActivityMainBinding binding;
 
+    SensingFragment sensingFragment;
     public postdata postdata = new postdata();
 
     List<String> mac1jo = new ArrayList<>(Arrays.asList("D8:3A:DD:42:AC:7F", "D8:3A:DD:42:AC:64",
@@ -81,38 +100,40 @@ public class MainActivity extends AppCompatActivity {
     List<String> mac5jo = new ArrayList<>(Arrays.asList("B8:27:EB:47:8D:50", "B8:27:EB:D3:40:06",
             "B8:27:EB:E4:D0:FC", "B8:27:EB:57:71:7D"));
 
-
+    ViewPager2Adapter viewPager2Adapter
+            = new ViewPager2Adapter(getSupportFragmentManager(), getLifecycle());
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
 
-        TextView tv = findViewById(R.id.tv);
-        Button bt_show = findViewById(R.id.bt_show);
+        ma_binding = ActivityMainBinding.inflate(getLayoutInflater());
+        se_binding = SensingLayoutBinding.inflate(getLayoutInflater());
 
-        Button bt_store = findViewById(R.id.bt_store);
-        Button bt_delet = findViewById(R.id.bt_delet);
+        setContentView(ma_binding.getRoot());
 
-        sw_bt = findViewById(R.id.sw_bt);
-        ed_sens = findViewById(R.id.ed_sens);
-        ed_mac = findViewById(R.id.ed_mac);
-        ed_time = findViewById(R.id.ed_time);
-        ed_otp = findViewById(R.id.ed_otp);
-        ed_rcv = findViewById(R.id.ed_rcv);
-        ed_pm1_0 = findViewById(R.id.ed_pm1_0);
-        ed_pm25 = findViewById(R.id.ed_pm2_5);
-        ed_pm10 = findViewById(R.id.ed_pm10);
+        tab = ma_binding.tab;
 
+        ViewPager2 viewPager2 = ma_binding.pager;
+        viewPager2.setAdapter(viewPager2Adapter);
+
+        viewPager2.setPageTransformer(new ZoomOutTransformer());
+
+        new TabLayoutMediator(tab, viewPager2, new TabLayoutMediator.TabConfigurationStrategy() {
+            @Override
+            public void onConfigureTab(@NonNull TabLayout.Tab tab, int i) {
+                tab.setText("Tab " + (i + 1));
+            }
+        }).attach();
 
         BluetoothAdapter blead = BluetoothAdapter.getDefaultAdapter();
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
         }
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1000);
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -135,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
             blead.enable();
         blead.startLeScan(scancallback_le);
 
-
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -148,119 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         soundID = soundPool.load(this, R.raw.success, 1);
 
-        bt_store.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                try {
-                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
-                    if (!file.exists()) {
-                        file.createNewFile();
-                    }
-
-
-                    FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
-                    BufferedWriter bw = new BufferedWriter(fw);
-
-                    for (int j = 0; j < datalist.size(); j++) {
-
-                        bw.write(String.valueOf(datalist.get(j).get_sens()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_mac()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_time()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_otp()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_rcv()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_p01()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_p25()));
-                        bw.write("," + String.valueOf(datalist.get(j).get_p10()));
-
-                        bw.newLine();
-                    }
-
-
-                    bw.close();
-                    fw.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-
-                datalist.clear();
-
-
-            }
-        });
-        bt_delet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                try {
-                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
-                    if (!file.exists()) {
-                        file.createNewFile();
-                    }
-
-
-                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                    BufferedWriter bw = new BufferedWriter(fw);
-
-                    bw.write("");
-
-                    bw.close();
-                    fw.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-
-
-            }
-                                    });
-
-        bt_show.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                try {
-                    tv.setText("");
-                    String line;
-                    BufferedReader br = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv"));
-                    while ((line = br.readLine()) != null) {
-                        tv.setText(tv.getText() + line + "\n");
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        });
-
-        sw_bt.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-
-            @Override
-
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == true){
-                    sw_bt.setChecked(true);
-                    blead.startLeScan(scancallback_le);
-                    sw_bt.setText("블루투스 스캔중");
-                }
-                else {
-                    sw_bt.setChecked(false);
-                    blead.stopLeScan(scancallback_le);
-                    sw_bt.setText("블루투스 스캔 종료");
-                }
-
-
-
-            }
-
-        });
-
-
     }
-
 
     private BluetoothAdapter.LeScanCallback scancallback_le = new BluetoothAdapter.LeScanCallback() {
 
@@ -287,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
 
                 soundPool.play(soundID, 1, 1, 0, 0, 1);
 
-                blead.stopLeScan(scancallback_le);
-                sw_bt.setChecked(false);
+                //blead.stopLeScan(scancallback_le);
+                //sw_bt.setChecked(false);
 
                 if (mac1jo.contains(MacAdd)) {
                     sensor = "1jo";
@@ -312,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 ed_time.setText(datasplit[1]);
                 ed_otp.setText(datasplit[0]);
                 ed_rcv.setText("1jo");
-                ed_pm1_0.setText(pm[0]);
+                ed_pm0_1.setText(pm[0]);
                 ed_pm25.setText(pm[1]);
                 ed_pm10.setText(pm[2]);
 
@@ -362,11 +270,12 @@ public class MainActivity extends AppCompatActivity {
                 BLEdata_storage ble = new BLEdata_storage(sensor, MacAdd, Integer.parseInt(datasplit[1]), Integer.parseInt(datasplit[0]), "1jo", pm[0],pm[1],pm[2]);
 
                 datalist.add(ble);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
 
                 sendData(postdata);
 
@@ -377,6 +286,36 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
+    private class ZoomOutTransformer implements ViewPager2.PageTransformer {
+        private static final float MIN_SCALE=0.85f;
+        private static final float MIN_ALPHA=0.5f;
+
+        @Override
+        public void transformPage(@NonNull View page, float position) {
+            int pageWidth = page.getWidth();
+            int pageHeight = page.getHeight();
+            if (position < -1) {            // [-Infinity, -1) 왼쪽 화면 밖
+                page.setAlpha(0f);
+            } else if (position <= 1) {     // [-1, 1]
+                float scaleFactor = Math.max(MIN_SCALE, 1 - Math.abs(position));
+                float vertMargin = pageHeight * (1-scaleFactor) / 2;
+                float horzMargin = pageWidth * (1-scaleFactor) / 2;
+
+                if (position < 0) {
+                    page.setTranslationX(horzMargin - vertMargin/2);
+                } else {
+                    page.setTranslationX(-horzMargin + vertMargin/2);
+                }
+                page.setScaleX(scaleFactor);
+                page.setScaleY(scaleFactor);
+                page.setAlpha(MIN_ALPHA + (scaleFactor - MIN_SCALE) / (1 - MIN_SCALE) * (1 - MIN_ALPHA));
+            } else {                        // (1, +Infinity] 오른쪽 화면 밖
+                page.setAlpha(0f);
+            }
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -496,5 +435,121 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public void setSwitch(Switch sw){
+        sw_bt = sw;
+
+        sw_bt.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+            @Override
+
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked == true){
+                    sw_bt.setChecked(true);
+                    blead.startLeScan(scancallback_le);
+                    sw_bt.setText("블루투스 스캔중");
+                }
+                else {
+                    sw_bt.setChecked(false);
+                    blead.stopLeScan(scancallback_le);
+                    sw_bt.setText("블루투스 스캔 종료");
+                }
+            }
+        });
+    }
+
+    public void setBtShow(Button bt){
+        bt_show = bt;
+        bt_show.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try {
+                    tv.setText("");
+                    String line;
+                    BufferedReader br = new BufferedReader(new FileReader(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv"));
+                    while ((line = br.readLine()) != null) {
+                        tv.setText(tv.getText() + line + "\n");
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        });
+    }
+
+    public void setBtStore(Button bt){
+        bt_store = bt;
+        bt_store.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile(), true);
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    for (int j = 0; j < datalist.size(); j++) {
+
+                        bw.write(String.valueOf(datalist.get(j).get_sens()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_mac()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_time()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_otp()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_rcv()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_p01()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_p25()));
+                        bw.write("," + String.valueOf(datalist.get(j).get_p10()));
+
+                        bw.newLine();
+                    }
+
+                    bw.close();
+                    fw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                datalist.clear();
+            }
+        });
+    }
+
+    public void setBtDelet(Button bt){
+        bt_delet = bt;
+        bt_delet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try {
+                    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/store_test.csv");
+                    if (!file.exists()) {
+                        file.createNewFile();
+                    }
+
+                    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                    BufferedWriter bw = new BufferedWriter(fw);
+
+                    bw.write("");
+
+                    bw.close();
+                    fw.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    public void setText(TextView tev, EditText sens, EditText mac, EditText time, EditText otp, EditText rcv,
+                        EditText pm01, EditText pm25, EditText pm10){
+        tv = tev;
+        ed_sens = sens; ed_mac = mac; ed_time = time; ed_otp = otp; ed_rcv = rcv;
+        ed_pm0_1 = pm01; ed_pm25 = pm25; ed_pm10 = pm10;
+    }
+
+    public void setListView(ListView listView){
+        listView.setOnItemClickListener(new myOnItemClickListener());    }
 
 }
