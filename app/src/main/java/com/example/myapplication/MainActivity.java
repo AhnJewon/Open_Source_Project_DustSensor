@@ -545,6 +545,8 @@ public class MainActivity extends AppCompatActivity {
         ed_pm25 = pm25;
         ed_pm10 = pm10;
     }
+
+
 }
 
 
