@@ -12,7 +12,18 @@ public class postdata {
    // @SerializedName("data") private String data;
 
     @SerializedName("sensor")
+    private String sensor;
+    @SerializedName("mac")
+    private String mac;
+    @SerializedName("receiver")
+    private String receiver;
 
+    @SerializedName("time")
+    private String time;
+    @SerializedName("otp")
+    private String otp;
+    @SerializedName("data")
+    private String data;
 
 
     public void set_data(String sensor, String mac, String receiver, String time, String otp, String data) {
