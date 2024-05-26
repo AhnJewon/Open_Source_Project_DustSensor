@@ -19,8 +19,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:checked="true"
-            android:text="블루투스 스캔중" />
+            android:checked="false"
+            android:text="블루투스 스캔 종료" />
     </LinearLayout>
 
     <LinearLayout
@@ -165,7 +165,7 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1">
 
             <LinearLayout
