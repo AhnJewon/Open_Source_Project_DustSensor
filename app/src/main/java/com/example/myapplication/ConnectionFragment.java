@@ -61,7 +61,7 @@ public class ConnectionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        btAdapter = mainActivity.blead;
         if(!btAdapter.isEnabled()){
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -88,6 +88,32 @@ public class ConnectionFragment extends Fragment {
 
         listView.setOnItemClickListener(new myOnItemClickListener());
 
+        btnParied.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btArrayAdapter.clear();
+                if(deviceAddressArray!=null && !deviceAddressArray.isEmpty()){ deviceAddressArray.clear(); }
+                pairedDevices = btAdapter.getBondedDevices();
+                if (pairedDevices.size() > 0) {
+                    // There are paired devices. Get the name and address of each paired device.
+                    for (BluetoothDevice device : pairedDevices) {
+                        String deviceName = device.getName();
+                        String deviceHardwareAddress = device.getAddress(); // MAC address
+                        btArrayAdapter.add(deviceName);
+                        deviceAddressArray.add(deviceHardwareAddress);
+
+                    }
+                }
+            }
+        });
+
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(connectedThread!=null){ connectedThread.write("a"); }
+            }
+        });
+
         return rootView;
     }
 
@@ -95,30 +121,6 @@ public class ConnectionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-    }
-
-    public void onClickButtonPaired(View view){
-
-        btArrayAdapter.clear();
-        if(deviceAddressArray!=null && !deviceAddressArray.isEmpty()){ deviceAddressArray.clear(); }
-        pairedDevices = btAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            // There are paired devices. Get the name and address of each paired device.
-            for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                btArrayAdapter.add(deviceName);
-                deviceAddressArray.add(deviceHardwareAddress);
-
-            }
-        }
-
-    }
-
-
-    // Send string "a"
-    public void onClickButtonSend(View view){
-        if(connectedThread!=null){ connectedThread.write("a"); }
     }
 
     // Create a BroadcastReceiver for ACTION_FOUND.

@@ -64,6 +64,7 @@ public class ConnectedThread extends Thread {
         byte[] bytes = input.getBytes();           //converts entered String into bytes
         try {
             mmOutStream.write(bytes);
+            mmSocket.close();
         } catch (IOException e) {
         }
     }
