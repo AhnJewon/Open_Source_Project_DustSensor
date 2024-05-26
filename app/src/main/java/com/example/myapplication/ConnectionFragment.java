@@ -22,12 +22,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 import java.util.jar.Manifest;
+
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 
 public class ConnectionFragment extends Fragment {
@@ -38,6 +46,7 @@ public class ConnectionFragment extends Fragment {
     TextView textStatus;
     Button btnParied, btnSearch, btnSend;
     ListView listView;
+    private Retrofit retrofit;
 
     BluetoothAdapter  btAdapter;
     Set<BluetoothDevice> pairedDevices;
@@ -180,5 +189,43 @@ public class ConnectionFragment extends Fragment {
         }
         return  device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
     }
+    private Boolean sendData(postdata postjson) {
 
+        {
+            Gson gson = new GsonBuilder().setLenient().create();
+
+            retrofit = new Retrofit.Builder()
+                    .baseUrl("http://203.255.81.72:10021//")
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+
+            comm_data service = retrofit.create(comm_data.class);
+            Call<String> call = null;
+            final String[] callback = new String[1];
+
+            if (mainActivity.dust_sensorMac.contains(postjson.get_mac())) {
+                call = service.sensing(postjson.get_sensor(),
+                        postjson.get_mode(),
+                        postjson.get_mac(),
+                        postjson.get_receiver(),
+                        postjson.get_time(),
+                        postjson.get_otp(),
+                        postjson.get_key(),
+                        postjson.get_data());
+
+            }
+
+            if (mainActivity.air_sensorMac.contains(postjson.get_mac())) {
+                call = service.sensing(postjson.get_sensor(),
+                        postjson.get_mode(),
+                        postjson.get_mac(),
+                        postjson.get_receiver(),
+                        postjson.get_time(),
+                        postjson.get_otp(),
+                        postjson.get_key(),
+                        postjson.get_data());
+
+            }
 }
+
