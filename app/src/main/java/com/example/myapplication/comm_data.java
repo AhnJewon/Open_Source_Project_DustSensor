@@ -36,6 +36,12 @@ public interface comm_data {
             @Query("data") String data
     );
 
+    @FormUrlEncoded
+    @POST("localization/locationcheck/")
+    Call<String> location(
+            @Field("wifidata") String data
+    );
+
 }
 
 

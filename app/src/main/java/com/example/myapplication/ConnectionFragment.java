@@ -111,7 +111,13 @@ public class ConnectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(connectedThread!=null){ connectedThread.write("a"); }
+                try {
+                    mainActivity.start();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
+
         });
 
         return rootView;

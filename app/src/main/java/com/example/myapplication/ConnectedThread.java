@@ -76,4 +76,28 @@ public class ConnectedThread extends Thread {
         } catch (IOException e) {
         }
     }
+
+    //private String 함수명(byte[] sb) {
+//        String pass = sb.toString();
+//        Log.i("Pass", pass);
+//
+//        String time = "", timeotp = "", mac = "";
+//
+//        int index = pass.indexOf("!");
+//        if (index != -1) {
+//            pm = pass.substring(0, index-1);
+//            pass = pass.substring(index +1);
+//            time = pass.substring(0, 10);
+//            pass = pass.substring(11);
+//            timeotp = pass.substring(0,4);
+//            pass = pass.substring(5);
+//            mac = pass.substring(0)
+
+//            Log.i("Time", time);
+//            Log.i("TimeOTP", timeotp);
+//            Log.i("Mac", mac);
+//        }
+//pm1.0/pm2.5/pm10.0!time!timeotp!mac 주소
+//
+//Ex. 8/9/10!1798108442!1234!B8:AC:24:55:66:EE
 }
