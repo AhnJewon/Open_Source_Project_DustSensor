@@ -50,7 +50,26 @@ public class ConnectedThread extends Thread {
                     bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
                     String data = new String(buffer, StandardCharsets.UTF_8);
                     Log.e("data", data);
+
+                    String pm = "", time = "", timeotp = "", mac = "";
+
+                    int index = data.indexOf("!");
+                    pm = data.substring(0, index);
+                    data = data.substring(index +1);
+                    time = data.substring(0, 10);
+                    data = data.substring(11);
+
+                    index = data.indexOf("!");
+                    timeotp = data.substring(0, index);
+                    data = data.substring(index+1);
+                    mac = data.substring(0,17);
+
+                    Log.i("PM", pm);
+                    Log.i("Time", time);
+                    Log.i("TimeOTP", timeotp);
+                    Log.i("Mac", mac);
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
 

@@ -21,6 +21,31 @@ public interface comm_data {
             @Field("data") String data
     );
 
+    @FormUrlEncoded
+    @POST("airquality/sensing/")
+    Call<String> air_sensing(
+            @Field("sensor") String sensor,
+            @Field("mode") String mode,
+            @Field("mac") String mac,
+            @Field("receiver") String receiver,
+            @Field("time") String time,
+            @Field("otp") String otp,
+            @Field("key")  String key,
+            @Field("data") String data
+    );
+    @FormUrlEncoded
+    @POST("dustsensor_v2/sensing/")
+    Call<String> sensing(
+            @Field("sensor") String sensor,
+            @Field("mode") String mode,
+            @Field("mac") String mac,
+            @Field("receiver") String receiver,
+            @Field("time") String time,
+            @Field("otp") String otp,
+            @Field("key")  String key,
+            @Field("data") String data
+    );
+
     @POST("dustsensor/sensing/")
     Call<postdata> post_json(
             @Body postdata pd

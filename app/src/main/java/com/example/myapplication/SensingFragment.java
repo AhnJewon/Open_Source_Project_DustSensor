@@ -148,7 +148,7 @@ public class SensingFragment extends Fragment {
                     sensor = "ta";
                 }
 
-                postdata.set_data(sensor, MacAdd, "1jo",
+                postdata.set_data( sensor ,  "advertising",MacAdd, "1jo", postdata.get_time(),
                         datasplit[1], datasplit[0], datasplit[2]);
                 String pm[] = datasplit[2].split("/");
                 ed_sens.setText(sensor);
@@ -416,31 +416,56 @@ public class SensingFragment extends Fragment {
 
     private Boolean sendData(postdata postjson) {
 
-        Gson gson = new GsonBuilder().setLenient().create();
+            {
+            Gson gson = new GsonBuilder().setLenient().create();
 
-        retrofit = new Retrofit.Builder()
-                .baseUrl("http://203.255.81.72:10021/")
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+            retrofit = new Retrofit.Builder()
+                    .baseUrl("http://203.255.81.72:10021//")
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
 
-        comm_data service = retrofit.create(comm_data.class);
+            comm_data service = retrofit.create(comm_data.class);
+                Call<String> call = null;
+                final String[] callback = new String[1];
 
-        Call<String> call = null;
-        call = service.post(postjson.get_sensor(), postjson.get_mac(), postjson.get_receiver(), postjson.get_time(), postjson.get_otp(), postjson.get_data());
+                if (mainActivity.dust_sensorMac.contains(postjson.get_mac())) {
+                        call = service.sensing(postjson.get_sensor(),
+                                postjson.get_mode(),
+                                postjson.get_mac(),
+                                postjson.get_receiver(),
+                                postjson.get_time(),
+                                postjson.get_otp(),
+                                postjson.get_key(),
+                                postjson.get_data());
 
-        final String[] callback = new String[1];
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.e("test", response.body().toString());
-                callback[0] = response.body().toString();
-            }
+                    }
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
+                if (mainActivity.air_sensorMac.contains(postjson.get_mac())) {
+                        call = service.air_sensing(postjson.get_sensor(),
+                                postjson.get_mode(),
+                                postjson.get_mac(),
+                                postjson.get_receiver(),
+                                postjson.get_time(),
+                                postjson.get_otp(),
+                                postjson.get_key(),
+                                postjson.get_data());
 
-            }
+                        }
+
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        Log.e("test", response.body().toString());
+                        callback[0] = response.body().toString();
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                    }
+
+
+
 
         });
 

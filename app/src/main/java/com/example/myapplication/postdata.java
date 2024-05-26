@@ -13,6 +13,9 @@ public class postdata {
 
     @SerializedName("sensor")
     private String sensor;
+
+    @SerializedName("mode")
+    private String mode;
     @SerializedName("mac")
     private String mac;
     @SerializedName("receiver")
@@ -22,16 +25,23 @@ public class postdata {
     private String time;
     @SerializedName("otp")
     private String otp;
+
+    @SerializedName("key")
+    private String key;
+
     @SerializedName("data")
     private String data;
 
 
-    public void set_data(String sensor, String mac, String receiver, String time, String otp, String data) {
+    public void set_data(String sensor, String mode, String mac, String receiver, String time, String otp,String key, String data) {
         this.sensor = sensor;
+        this.mode = mode;
+
         this.mac = mac;
         this.receiver = receiver;
         this.time = time;
         this.otp = otp;
+        this.key = key;
         this.data = data;
     }
 
@@ -46,15 +56,16 @@ public class postdata {
     public String get_receiver() {
         return receiver;
     }
-    public String get_time() {
-        return time;
-    }
+    public String get_time() {return time;}
     public String get_otp() {
         return otp;
     }
-    public String get_data() {
-        return data;
-    }
+
+    public String get_key() {return key; }
+
+    public String get_data() {return data; }
+
+    public String get_mode() { return mode; }
 }
 
 

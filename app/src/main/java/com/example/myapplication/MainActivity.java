@@ -74,6 +74,14 @@ public class MainActivity extends AppCompatActivity {
     List<String> mac5jo = new ArrayList<>(Arrays.asList("B8:27:EB:47:8D:50", "B8:27:EB:D3:40:06",
             "B8:27:EB:E4:D0:FC", "B8:27:EB:57:71:7D"));
 
+    List<String> dust_sensorMac = new ArrayList<>(Arrays.asList("D8:3A:DD:42:AC:7F", "D8:3A:DD:42:AC:64",
+            "B8:27:EB:DA:F2:5B", "B8:27:EB:0C:F3:83"));
+
+    List<String> air_sensorMac = new ArrayList<>(Arrays.asList("D8:3A:DD:C1:89:2E", "D8:3A:DD:C1:88:DD",
+            "D8:3A:DD:C1:89:1E", "D8:3A:DD:C1:88:99"));
+
+
+
     ViewPager2Adapter viewPager2Adapter
             = new ViewPager2Adapter(getSupportFragmentManager(), getLifecycle());
 
