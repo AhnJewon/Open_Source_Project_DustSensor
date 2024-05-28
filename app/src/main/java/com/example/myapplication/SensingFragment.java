@@ -181,6 +181,7 @@ public class SensingFragment extends Fragment {
                     pparams.weight = 0.25f;
                     ed_rcv.setLayoutParams(pparams);
                     ed_pm0_1.setLayoutParams(pparams);
+                    pm01.setText("PM0.1");
 
                 } else {
                     lparams.weight = 0f;

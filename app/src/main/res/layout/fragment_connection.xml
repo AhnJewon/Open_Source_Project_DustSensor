@@ -29,7 +29,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            android:text="Button" />
+            tools:text="Search Device" />
 
         <Button
             android:id="@+id/btn_paired"
@@ -52,14 +52,8 @@
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.38">
+        android:layout_weight="0.79">
 
     </ListView>
-
-    <ListView
-        android:id="@+id/listview2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.38" />
 
 </LinearLayout>

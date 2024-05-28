@@ -111,20 +111,17 @@ public class ConnectionFragment extends Fragment {
         btnSend = (Button) rootView.findViewById(R.id.btn_send);
         btnSearch = (Button) rootView.findViewById(R.id.btn_search);
         listView = (ListView) rootView.findViewById(R.id.listview);
-        listview2 = (ListView) rootView.findViewById(R.id.listview2);
 
         btArrayAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_list_item_1);
         deviceAddressArray = new ArrayList<>();
-        listView.setAdapter(btArrayAdapter);
-        listview2.setAdapter(adapterDevice);
+        listView.setAdapter(adapterDevice);
 
         listView.setOnItemClickListener(new myOnItemClickListener());
-        listview2.setOnItemClickListener(new myOnItemClickListener());
 
         btnParied.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btArrayAdapter.clear();
+                dataDevice.clear();
                 if (deviceAddressArray != null && !deviceAddressArray.isEmpty()) {
                     deviceAddressArray.clear();
                 }
@@ -132,10 +129,13 @@ public class ConnectionFragment extends Fragment {
                 if (pairedDevices.size() > 0) {
                     // There are paired devices. Get the name and address of each paired device.
                     for (BluetoothDevice device : pairedDevices) {
-                        String deviceName = device.getName();
-                        String deviceHardwareAddress = device.getAddress(); // MAC address
-                        btArrayAdapter.add(deviceName);
-                        deviceAddressArray.add(deviceHardwareAddress);
+
+                        Map map = new HashMap();
+                        map.put("name", device.getName());
+                        map.put("address", device.getAddress());
+                        dataDevice.add(map);
+                        adapterDevice.notifyDataSetChanged();
+
 
                     }
                 }
@@ -162,6 +162,7 @@ public class ConnectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 btnSearch.setEnabled(false);
+                btnParied.setEnabled(false);
                 if(btAdapter.isDiscovering()){
                     btAdapter.cancelDiscovery();
                 }
@@ -181,6 +182,45 @@ public class ConnectionFragment extends Fragment {
     // Create a BroadcastReceiver for ACTION_FOUND.
 
     public class myOnItemClickListener implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(mainActivity.getApplicationContext(), dataDevice.get(position).get("name"), Toast.LENGTH_SHORT).show();
+
+            textStatus.setText("try...");
+
+            final String name = dataDevice.get(position).get("name"); // get name
+            final String address = dataDevice.get(position).get("address"); // get address
+            boolean flag = true;
+
+            BluetoothDevice device = btAdapter.getRemoteDevice(address);
+
+            // create & connect socket
+            try {
+                btSocket = createBluetoothSocket(device);
+            } catch (IOException e) {
+                textStatus.setText("connection failed!");
+                e.printStackTrace();
+            }
+
+            try {
+                btSocket.connect();
+            } catch (IOException e) {
+                try {
+                    btSocket.close();
+                } catch (IOException e2) {
+                    Log.e(TAG, "unable to close() socket during connection failure", e2);
+                }
+            }
+            // start bluetooth communication
+            connectedThread = new ConnectedThread(btSocket, mainActivity);
+            textStatus.setText("connected to " + name);
+            connectedThread.start();
+        }
+
+
+    }
+    /* public class myOnItemClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -218,7 +258,7 @@ public class ConnectionFragment extends Fragment {
         }
 
 
-    }
+    }*/
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         try {
@@ -242,17 +282,21 @@ public class ConnectionFragment extends Fragment {
                 case BluetoothDevice.ACTION_FOUND:
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     Map map = new HashMap();
-                    map.put("name", device.getName());
-                    map.put("address", device.getAddress());
-                    dataDevice.add(map);
-                    adapterDevice.notifyDataSetChanged();
+                    if(device.getName() != null) {
+                        map.put("name", device.getName());
+                        map.put("address", device.getAddress());
+                        dataDevice.add(map);
+                        adapterDevice.notifyDataSetChanged();
+                    }
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     Toast.makeText(mainActivity.getApplicationContext(),"Stop bluetooth searching", Toast.LENGTH_SHORT ).show();
                     btnSearch.setEnabled(true);
+                    btnParied.setEnabled(false);
             }
         }
     };
+
 
     }
 
