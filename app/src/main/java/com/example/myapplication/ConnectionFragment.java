@@ -253,7 +253,7 @@ public class ConnectionFragment extends Fragment {
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     Toast.makeText(mainActivity.getApplicationContext(),"Stop bluetooth searching", Toast.LENGTH_SHORT ).show();
                     btnSearch.setEnabled(true);
-                    btnParied.setEnabled(false);
+                    btnParied.setEnabled(true);
             }
         }
     };

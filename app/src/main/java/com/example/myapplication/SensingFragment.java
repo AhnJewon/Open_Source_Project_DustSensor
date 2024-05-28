@@ -320,7 +320,7 @@ public class SensingFragment extends Fragment {
         if(!tbt_change.isChecked()){
             for(int i=index+2; i<index+8; i+=2){
                 sb.append(Integer.parseInt(scan.substring(i,i+2),16));
-                sb.append("/");
+                if(i<index+6){sb.append("/");}
             }
             postdata.set_data(sb.toString());
         } else {
