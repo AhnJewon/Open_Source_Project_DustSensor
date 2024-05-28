@@ -110,7 +110,7 @@ public class SensingFragment extends Fragment {
                 .setAudioAttributes(audioAttributes)
                 .build();
 
-        soundID = soundPool.load(mainActivity, R.raw.success, 1);
+        soundID = soundPool.load(mainActivity, R.raw.iponenew, 1);
 
         postdata.set_receiver(mainActivity.getId());
         postdata.set_mode("advertising");
@@ -369,6 +369,13 @@ public class SensingFragment extends Fragment {
                 ed_otp.setText(postdata.get_otp());
                 ed_rcv.setText(postdata.get_receiver());
 
+                int iconResId1, iconResId2;
+
+
+
+
+
+
                 if(!tbt_change.isChecked()) {
                     String[] pm = postdata.get_data().split("/");
                     ed_pm0_1.setText(pm[0]);
@@ -384,33 +391,42 @@ public class SensingFragment extends Fragment {
                     if (intTwo >= 0 && intTwo <= 15) {
                         ed_pm25.setTextColor(Color.parseColor("#549FF8"));
                         text1 = "초미세먼지 좋음";
+                        iconResId1 = R.drawable.happy;
                     } else if (intTwo <= 35) {
                         ed_pm25.setTextColor(Color.parseColor("#52C148"));
                         text1 = "초미세먼지 보통";
+                        iconResId1 = R.drawable.good;
                     } else if (intTwo <= 75) {
                         ed_pm25.setTextColor(Color.parseColor("#EE9D62"));
                         text1 = "초미세먼지 나쁨";
+                        iconResId1 = R.drawable.soso;
                     } else {
                         ed_pm25.setTextColor(Color.parseColor("#EC655F"));
                         text1 = "초미세먼지 매우 나쁨";
+                        iconResId1 = R.drawable.sad;
                     }
 
                     //미세먼지 색 바꾸기, 토스트메시지 띄우기
                     if (intThree >= 0 && intThree <= 30) {
                         ed_pm10.setTextColor(Color.parseColor("#549FF8"));
                         text2 = "미세먼지 좋음";
+                        iconResId2 = R.drawable.happy;
                     } else if (intThree <= 80) {
                         ed_pm10.setTextColor(Color.parseColor("#52C148"));
                         text2 = "미세먼지 보통";
+                        iconResId2 = R.drawable.good;
                     } else if (intThree <= 150) {
                         ed_pm10.setTextColor(Color.parseColor("#EE9D62"));
                         text2 = "미세먼지 나쁨";
+                        iconResId2 = R.drawable.soso;
                     } else {
                         ed_pm25.setTextColor(Color.parseColor("#EC655F"));
                         text2 = "미세먼지 매우 나쁨";
+                        iconResId2 = R.drawable.sad;
                     }
 
-
+                    showCustomToast(mainActivity.getApplicationContext(), text1 + "\n" + text2, iconResId1);
+                    showCustomToast(mainActivity.getApplicationContext(), text1 + "\n" + text2, iconResId2);
 
                 } else {
                     ed_pm0_1.setText(postdata.get_data());
@@ -418,21 +434,24 @@ public class SensingFragment extends Fragment {
                     if (Integer.parseInt(postdata.get_data()) >= 0 && Integer.parseInt(postdata.get_data()) <= 50) {
                         ed_pm0_1.setTextColor(Color.parseColor("#549FF8"));
                         text3 = "공기질 좋음 : 오늘은 야외활동 어떠신가요?";
+                        iconResId1 = R.drawable.happy;
                     }
                     else if (Integer.parseInt(postdata.get_data()) <= 100) {
                         ed_pm0_1.setTextColor(Color.parseColor("#52C148"));
                         text3 = "공기질 보통 : 오늘은 메타세콰이어길에서 피크닉 한번?! ";
-
+                        iconResId1 = R.drawable.good;
                     } else if (Integer.parseInt(postdata.get_data()) <= 250) {
                         ed_pm0_1.setTextColor(Color.parseColor("#EC655F"));
                         text3 = "공기질 나쁨 : 오늘은 도서관에서 공부합시다ㅜ ";
+                        iconResId1 = R.drawable.soso;
                     } else
                     {
                         ed_pm0_1.setTextColor(Color.parseColor("#7E0023"));
                         text3 = " 공기질 매우 나쁨 : 이불 안이 최고야~ ";
-
+                        iconResId1 = R.drawable.sad;
                     }
-                    Toast.makeText(mainActivity.getApplicationContext(), text3, Toast.LENGTH_LONG).show();
+                    showCustomToast(mainActivity.getApplicationContext(), text3, iconResId1);
+
 
                 }
 
@@ -590,6 +609,26 @@ public class SensingFragment extends Fragment {
 
         return pass;
     }*/
+
+    public void showCustomToast(Context context, String message, int iconResId) {
+        // 커스텀 토스트 레이아웃을 인플레이트합니다.
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View layout = inflater.inflate(R.layout.custom_toast, null);
+
+        // 레이아웃에서 ImageView와 TextView를 찾습니다.
+        ImageView toastIcon = layout.findViewById(R.id.toast_icon);
+        TextView toastText = layout.findViewById(R.id.toast_text);
+
+        // 아이콘과 메시지를 설정합니다.
+        toastIcon.setImageResource(iconResId);
+        toastText.setText(message);
+
+        // 토스트를 생성하고 보여줍니다.
+        Toast toast = new Toast(context);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();
+    }
 
 }
 
