@@ -22,6 +22,12 @@
         </com.example.myapplication.MyWebView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/puple" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_a"
         android:layout_width="match_parent"
