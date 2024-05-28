@@ -410,7 +410,29 @@ public class SensingFragment extends Fragment {
 
                     Toast.makeText(mainActivity.getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
                 } else {
-                    ed_pm0_1.setText(postdata.get_data());
+                    String text3;
+                    if (Integer.parseInt(postdata.get_data()) >= 0 && Integer.parseInt(postdata.get_data()) <= 50) {
+                        ed_pm0_1.setTextColor(Color.parseColor("#549FF8"));
+                        text3 = "공기질 좋음";
+                    }
+                    else if (Integer.parseInt(postdata.get_data()) <= 100) {
+                        ed_pm0_1.setTextColor(Color.parseColor("#52C148"));
+                        text3 = "공기질 보통";
+                    } else if (Integer.parseInt(postdata.get_data()) <= 150) {
+                        ed_pm0_1.setTextColor(Color.parseColor("#EE9D62"));
+                        text3 = "공기질 민감군에 나쁨";
+                    } else if (Integer.parseInt(postdata.get_data()) <= 200) {
+                        ed_pm0_1.setTextColor(Color.parseColor("#EC655F"));
+                        text3 = "공기질 나쁨";
+                    } else if (Integer.parseInt(postdata.get_data()) <= 300) {
+                        ed_pm0_1.setTextColor(Color.parseColor("#7E0023"));
+                        text3 = "공기질 매우 나쁨";
+                    } else {
+                        ed_pm0_1.setTextColor(Color.parseColor("#8F3F97"));
+                        text3 = "공기질 위험";
+                    }
+                    Toast.makeText(mainActivity.getApplicationContext(), text3, Toast.LENGTH_LONG).show();
+
                 }
 
                 BLEdata_storage ble = new BLEdata_storage(postdata.get_sensor(), postdata.get_mode(), postdata.get_mac(), postdata.get_time(), postdata.get_otp(), postdata.get_receiver(), postdata.get_data(), postdata.get_key());

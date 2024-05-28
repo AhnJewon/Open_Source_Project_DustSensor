@@ -23,6 +23,16 @@
             android:gravity="bottom|left"
             android:text="Appname"
             android:textSize="34sp" />
+
+        <EditText
+            android:id="@+id/ed_aqi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="AQI"
+            android:inputType="number"
+            android:layout_marginTop="16dp"
+            />
+
     </LinearLayout>
 
     <com.google.android.material.tabs.TabLayout
