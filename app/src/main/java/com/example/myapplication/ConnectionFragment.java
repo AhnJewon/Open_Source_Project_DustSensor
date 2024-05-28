@@ -220,45 +220,6 @@ public class ConnectionFragment extends Fragment {
 
 
     }
-    /* public class myOnItemClickListener implements AdapterView.OnItemClickListener {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(mainActivity.getApplicationContext(), btArrayAdapter.getItem(position), Toast.LENGTH_SHORT).show();
-
-            textStatus.setText("try...");
-
-            final String name = btArrayAdapter.getItem(position); // get name
-            final String address = deviceAddressArray.get(position); // get address
-            boolean flag = true;
-
-            BluetoothDevice device = btAdapter.getRemoteDevice(address);
-
-            // create & connect socket
-            try {
-                btSocket = createBluetoothSocket(device);
-            } catch (IOException e) {
-                textStatus.setText("connection failed!");
-                e.printStackTrace();
-            }
-
-            try {
-                btSocket.connect();
-            } catch (IOException e) {
-                try {
-                    btSocket.close();
-                } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() socket during connection failure", e2);
-                }
-            }
-            // start bluetooth communication
-            connectedThread = new ConnectedThread(btSocket, mainActivity);
-            textStatus.setText("connected to " + name);
-            connectedThread.start();
-        }
-
-
-    }*/
 
     private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
         try {

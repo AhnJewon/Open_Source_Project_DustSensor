@@ -47,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     BluetoothAdapter blead = BluetoothAdapter.getDefaultAdapter();
     ConnectivityManager connectman;
     WifiManager wifiman;
+    String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
     private Retrofit retrofit;
     private TabLayout tab;
     private String wifidata;
@@ -55,10 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private SensingLayoutBinding se_binding;
     private ActivityMainBinding binding;
     private String key;
-
-
     private String id;
-
     ViewPager2Adapter viewPager2Adapter
             = new ViewPager2Adapter(getSupportFragmentManager(), getLifecycle());
     ViewPager2 viewPager2;
@@ -90,9 +91,24 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(tab, viewPager2, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int i) {
-                tab.setText("Tab " + (i + 1));
+                switch(i){
+                    case 0:
+                        tab.setText("Advertising");
+                    case 1:
+                        tab.setText("Connection");
+                    case 2:
+                        tab.setText("CheckingPage");
+                    case 3:
+                        tab.setText("Location");
+                }
             }
         }).attach();
+
+        tab.getTabAt(0).setText("Advertising");
+        tab.getTabAt(1).setText("Connection");
+        tab.getTabAt(2).setText("Result");
+        tab.getTabAt(3).setText("Location");
+
 
        connectman = (ConnectivityManager) getApplicationContext().getSystemService(CONNECTIVITY_SERVICE);
         if(connectman.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
