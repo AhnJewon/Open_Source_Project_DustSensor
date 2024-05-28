@@ -2,48 +2,42 @@ package com.example.myapplication;
 
 public class BLEdata_storage {
     private String sens;
+    private String mode;
     private String mac;
-    private int time;
-    private int otp;
+    private String time;
+    private String otp;
     private String rcv;
-    private String p01;
-    private String p25;
-    private String p10;
+    private String data;
+
+    private String key;
 
 
-    BLEdata_storage(String sens, String mac, int time, int otp, String rcv, String p01, String p25, String p10){
+    BLEdata_storage(String sens, String mode, String mac, String time, String otp, String rcv, String data, String key){
         this.sens = sens;
         this.mac = mac;
         this.rcv = rcv;
-        this.p01 = p01;
-        this.p25 = p25;
-        this.p10 = p10;
+        this.mode = mode;
+        this.data = data;
+
         this.time = time;
         this.otp = otp;
+        this.key = key;
     }
-    public String get_rcv(){
-        return rcv;
-    }
-    public String get_p01(){
-        return p01;
-    }
-    public String get_p25(){
-        return p25;
-    }
-    public String get_p10(){
-        return p10;
-    }
-    public int get_time(){
-        return time;
-    }
-    public String get_mac(){
-        return mac;
-    }
-    public String get_sens(){
+    public String get_sensor() {
         return sens;
     }
-    public int get_otp(){
+    public String get_mac() {
+        return mac;
+    }
+    public String get_receiver() {
+        return rcv;
+    }
+    public String get_time() {return time;}
+    public String get_otp() {
         return otp;
     }
+    public String get_key() {return key; }
+    public String get_data() {return data; }
+    public String get_mode() { return mode; }
 }
 

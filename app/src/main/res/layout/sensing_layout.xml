@@ -6,11 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:weightSum="10"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_weight="0.7"
         android:orientation="horizontal">
 
@@ -20,36 +21,64 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:checked="false"
-            android:text="블루투스 스캔 종료" />
+            android:text="블루투스 스캔 종료"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-        <Button
-            android:id="@+id/bt_show"
+        <TextView
+            android:id="@+id/textView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="데이터 확인" />
+            android:layout_weight="0.375"
+            android:gravity="center|left"
+            android:text="Type"
+            android:textSize="22sp"
+            app:autoSizeMaxTextSize="50sp"
+            app:autoSizeMinTextSize="20sp"
+            app:autoSizeStepGranularity="2sp" />
+
+        <ToggleButton
+            android:id="@+id/tbt_change"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.625"
+            android:backgroundTint="@color/material_dynamic_neutral30"
+            android:drawableTint="#CFBBFE"
+            android:foregroundTint="#CFBBFE"
+            android:shadowColor="#CFBBFE"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textOff="DustSensor"
+            android:textOn="AirQuality"
+            android:textSize="22dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.125"
-            android:text="sensor" />
+            android:gravity="center|left"
+            android:text="sensor"
+            android:textSize="14sp"
+            app:autoSizeMaxTextSize="20sp"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeStepGranularity="1sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/ed_sens"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -59,9 +88,14 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.125"
-            android:text="mac" />
+            android:gravity="center|left"
+            android:text="mac"
+            android:textSize="14sp"
+            app:autoSizeMaxTextSize="20sp"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeStepGranularity="1sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/ed_mac"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -71,17 +105,23 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.125"
-            android:text="otp" />
+            android:gravity="center|left"
+            android:text="otp"
+            android:textSize="14sp"
+            app:autoSizeMaxTextSize="20sp"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeStepGranularity="1sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/ed_otp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -91,9 +131,14 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.125"
-            android:text="time" />
+            android:gravity="center|left"
+            android:text="time"
+            android:textSize="14sp"
+            app:autoSizeMaxTextSize="20sp"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeStepGranularity="1sp" />
 
-        <EditText
+        <TextView
             android:id="@+id/ed_time"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -103,75 +148,119 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:orientation="horizontal">
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/layout1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="receiver" />
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:weightSum="1">
 
-        <EditText
-            android:id="@+id/ed_rcv"
+            <TextView
+                android:id="@+id/rcv"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:gravity="center|left"
+                android:text="receiver"
+                android:textSize="14sp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeStepGranularity="1sp" />
+
+            <TextView
+                android:id="@+id/ed_rcv"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25" />
+
+            <TextView
+                android:id="@+id/pm01"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:gravity="center|left"
+                android:text="PM0.1"
+                android:textSize="14sp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeStepGranularity="1sp" />
+
+            <TextView
+                android:id="@+id/ed_pm0.1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="0.5"
+            android:orientation="horizontal"
+            android:weightSum="1">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="PM0.1" />
+            <TextView
+                android:id="@+id/pm25"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:gravity="center|left"
+                android:text="PM2.5"
+                android:textSize="14sp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeStepGranularity="1sp" />
 
-        <EditText
-            android:id="@+id/ed_pm0.1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/ed_pm2.5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="PM2.5" />
+            <TextView
+                android:id="@+id/pm10"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25"
+                android:gravity="center|left"
+                android:text="PM10"
+                android:textSize="14sp"
+                app:autoSizeMaxTextSize="20sp"
+                app:autoSizeMinTextSize="12sp"
+                app:autoSizeStepGranularity="1sp" />
 
-        <EditText
-            android:id="@+id/ed_pm2.5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="PM10" />
-
-        <EditText
-            android:id="@+id/ed_pm10"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/ed_pm10"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.25" />
+        </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="6"
+        android:layout_height="0dp"
+        android:layout_weight="5.3"
         android:orientation="horizontal">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tv"
@@ -189,49 +278,41 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
         android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/bt_show"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:text="데이터 확인" />
 
-            <Button
-                android:id="@+id/bt_delet"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="삭제" />
+        <Button
+            android:id="@+id/bt_delet"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="삭제" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal"></LinearLayout>
-
-            <Button
-                android:id="@+id/bt_store"
-                style="@style/Widget.Material3.Button.Icon"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="저장" />
-        </LinearLayout>
+        <Button
+            android:id="@+id/bt_store"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#CFBBFE"
+            android:drawableTint="#919191"
+            android:text="저장" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.7"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"></LinearLayout>
-    </LinearLayout>
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="horizontal" />
 </LinearLayout>

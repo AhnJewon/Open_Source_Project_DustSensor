@@ -4,29 +4,25 @@ package com.example.myapplication;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.AdapterView;
-import android.media.AudioAttributes;
-import android.media.SoundPool;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.myapplication.databinding.ActivityMainBinding;
@@ -36,16 +32,8 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,33 +45,23 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     BluetoothAdapter blead = BluetoothAdapter.getDefaultAdapter();
+    ConnectivityManager connectman;
+    WifiManager wifiman;
+    private Retrofit retrofit;
     private TabLayout tab;
-    private int[] numofdata;
+    private String wifidata;
+    private int count;
     private ActivityMainBinding ma_binding;
     private SensingLayoutBinding se_binding;
     private ActivityMainBinding binding;
-
-    List<String> mac1jo = new ArrayList<>(Arrays.asList("D8:3A:DD:42:AC:7F", "D8:3A:DD:42:AC:64",
-            "B8:27:EB:DA:F2:5B", "B8:27:EB:0C:F3:83"));
-    List<String> mac2jo = new ArrayList<>(Arrays.asList("D8:3A:DD:79:8F:97", "D8:3A:DD:79:8F:B9",
-            "D8:3A:DD:79:8F:54", "D8:3A:DD:79:8F:80"));
-    List<String> mac3jo = new ArrayList<>(Arrays.asList("D8:3A:DD:79:8E:D9", "D8:3A:DD:42:AC:9A",
-            "D8:3A:DD:42:AB:FB", "D8:3A:DD:79:8E:9B"));
-    List<String> mac4jo = new ArrayList<>(Arrays.asList("D8:3A:DD:78:A7:1A", "D8:3A:DD:79:8E:BF",
-            "D8:3A:DD:79:8E:92", "D8:3A:DD:79:8F:59"));
-    List<String> mac5jo = new ArrayList<>(Arrays.asList("B8:27:EB:47:8D:50", "B8:27:EB:D3:40:06",
-            "B8:27:EB:E4:D0:FC", "B8:27:EB:57:71:7D"));
-
-    List<String> dust_sensorMac = new ArrayList<>(Arrays.asList("D8:3A:DD:42:AC:7F", "D8:3A:DD:42:AC:64",
-            "B8:27:EB:DA:F2:5B", "B8:27:EB:0C:F3:83"));
-
-    List<String> air_sensorMac = new ArrayList<>(Arrays.asList("D8:3A:DD:C1:89:2E", "D8:3A:DD:C1:88:DD",
-            "D8:3A:DD:C1:89:1E", "D8:3A:DD:C1:88:99"));
+    private String key;
 
 
+    private String id;
 
     ViewPager2Adapter viewPager2Adapter
             = new ViewPager2Adapter(getSupportFragmentManager(), getLifecycle());
+    ViewPager2 viewPager2;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -96,9 +74,15 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(ma_binding.getRoot());
 
+        id = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        registerReceiver(rssiReceiver, new IntentFilter((WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)));
+        registerReceiver(rssiReceiver, new IntentFilter((WifiManager.RSSI_CHANGED_ACTION)));
+
         tab = ma_binding.tab;
 
-        ViewPager2 viewPager2 = ma_binding.pager;
+        viewPager2 = ma_binding.pager;
+
         viewPager2.setAdapter(viewPager2Adapter);
 
         viewPager2.setPageTransformer(new ZoomOutTransformer());
@@ -110,7 +94,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }).attach();
 
-        //BluetoothAdapter blead = BluetoothAdapter.getDefaultAdapter();
+       connectman = (ConnectivityManager) getApplicationContext().getSystemService(CONNECTIVITY_SERVICE);
+        if(connectman.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
+            Log.i("wifi", "wifi connected!");
+        }else{
+            Log.i("wifi", "wifi not connected!");
+        }
+
+        wifiman = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
@@ -134,10 +126,18 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, 1000);
         }
 
+
         if (!blead.isEnabled())
             blead.enable();
         //blead.startLeScan(scancallback_le);
 
+        Gson gson = new GsonBuilder().setLenient().create();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl("http://203.255.81.72:10021/")
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
 
 
     }
@@ -172,6 +172,77 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    public void start() throws InterruptedException{
+        Log.i("wifi", "Start");
+
+        count = 0;
+
+        wifidata="";
+
+        if(!wifiman.startScan()){
+            Log.e("wifiScan1", "wifi scan fail!");
+        }
+
+    }
+
+    public BroadcastReceiver rssiReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
+            if(success){
+                scanSuccess();
+            }else{
+                Log.e("wifiScan2","wifi scan fail!");
+            }
+        }
+
+        private void scanSuccess(){
+            Log.i("wifi", String.valueOf(count));
+
+            List<ScanResult> scanresult = wifiman.getScanResults();
+            for (int i =0; i< scanresult.size(); i++){
+                int RSSI = scanresult.get(i).level;
+                String BSSID = scanresult.get(i).BSSID;
+
+                wifidata += (BSSID + "!" + String.valueOf(RSSI) + "/");
+                Log.i("wifidata", wifidata);
+            }
+            count++;
+
+            comm_data service = retrofit.create(comm_data.class);
+
+            Call<String>  call = null;
+
+            call = service.location(wifidata);
+
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    Log.i("wifiResponse", response.body().toString());
+                    key = response.body().toString();
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+
+                }
+            });
+
+        }
+    };
+
+    public Retrofit get_retrofit(){
+        return retrofit;
+    }
+    public String getLocation(){
+        return key;
+    }
+    public  String getId(){
+        return id;
+    }
+
 }
 
 

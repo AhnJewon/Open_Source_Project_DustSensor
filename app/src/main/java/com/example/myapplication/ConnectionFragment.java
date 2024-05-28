@@ -3,8 +3,10 @@ package com.example.myapplication;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,11 +31,16 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.jar.Manifest;
 
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
@@ -46,9 +54,9 @@ public class ConnectionFragment extends Fragment {
     TextView textStatus;
     Button btnParied, btnSearch, btnSend;
     ListView listView;
-    private Retrofit retrofit;
-
-    BluetoothAdapter  btAdapter;
+    ListView listview2;
+    private postdata postdata;
+    BluetoothAdapter btAdapter;
     Set<BluetoothDevice> pairedDevices;
     ArrayAdapter<String> btArrayAdapter;
     ArrayList<String> deviceAddressArray;
@@ -56,7 +64,8 @@ public class ConnectionFragment extends Fragment {
     private final static int REQUEST_ENABLE_BT = 1;
     BluetoothSocket btSocket = null;
     ConnectedThread connectedThread;
-
+    private List<Map<String,String>> dataDevice;
+    SimpleAdapter adapterDevice;
     MainActivity mainActivity;
 
     @Override
@@ -65,17 +74,28 @@ public class ConnectionFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
     }
 
+    @Override
+    public void onDestroy(){
+        mainActivity.unregisterReceiver(mBluetoothSearchReceiver);
+        super.onDestroy();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        dataDevice = new ArrayList<>();
+        adapterDevice = new SimpleAdapter(mainActivity.getApplicationContext(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"},new int[]{android.R.id.text1, android.R.id.text2});
         btAdapter = mainActivity.blead;
-        if(!btAdapter.isEnabled()){
+        if (!btAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-
+        IntentFilter searchFilter = new IntentFilter();
+        searchFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        searchFilter.addAction(BluetoothDevice.ACTION_FOUND);
+        searchFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        mainActivity.registerReceiver(mBluetoothSearchReceiver, searchFilter);
 
 
     }
@@ -89,19 +109,25 @@ public class ConnectionFragment extends Fragment {
         textStatus = (TextView) rootView.findViewById(R.id.text_status);
         btnParied = (Button) rootView.findViewById(R.id.btn_paired);
         btnSend = (Button) rootView.findViewById(R.id.btn_send);
+        btnSearch = (Button) rootView.findViewById(R.id.btn_search);
         listView = (ListView) rootView.findViewById(R.id.listview);
+        listview2 = (ListView) rootView.findViewById(R.id.listview2);
 
         btArrayAdapter = new ArrayAdapter<>(mainActivity, android.R.layout.simple_list_item_1);
         deviceAddressArray = new ArrayList<>();
         listView.setAdapter(btArrayAdapter);
+        listview2.setAdapter(adapterDevice);
 
         listView.setOnItemClickListener(new myOnItemClickListener());
+        listview2.setOnItemClickListener(new myOnItemClickListener());
 
         btnParied.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 btArrayAdapter.clear();
-                if(deviceAddressArray!=null && !deviceAddressArray.isEmpty()){ deviceAddressArray.clear(); }
+                if (deviceAddressArray != null && !deviceAddressArray.isEmpty()) {
+                    deviceAddressArray.clear();
+                }
                 pairedDevices = btAdapter.getBondedDevices();
                 if (pairedDevices.size() > 0) {
                     // There are paired devices. Get the name and address of each paired device.
@@ -119,7 +145,27 @@ public class ConnectionFragment extends Fragment {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(connectedThread!=null){ connectedThread.write("a"); }
+                if (connectedThread != null) {
+                    connectedThread.write("a");
+                }
+                try {
+                    mainActivity.start();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                textStatus.setText(mainActivity.getLocation());
+            }
+
+        });
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnSearch.setEnabled(false);
+                if(btAdapter.isDiscovering()){
+                    btAdapter.cancelDiscovery();
+                }
+                btAdapter.startDiscovery();
             }
         });
 
@@ -166,8 +212,8 @@ public class ConnectionFragment extends Fragment {
                 }
             }
             // start bluetooth communication
-            connectedThread = new ConnectedThread(btSocket);
-            textStatus.setText("connected to" + name);
+            connectedThread = new ConnectedThread(btSocket, mainActivity);
+            textStatus.setText("connected to " + name);
             connectedThread.start();
         }
 
@@ -179,47 +225,34 @@ public class ConnectionFragment extends Fragment {
             final Method m = device.getClass().getMethod("createInsecureRfcommSocketToServiceRecord", UUID.class);
             return (BluetoothSocket) m.invoke(device, BT_MODULE_UUID);
         } catch (Exception e) {
-            Log.e(TAG, "Could not create Insecure RFComm Connection",e);
+            Log.e(TAG, "Could not create Insecure RFComm Connection", e);
         }
-        return  device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
+        return device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
     }
-    private Boolean sendData(postdata postjson) {
 
-        {
-            Gson gson = new GsonBuilder().setLenient().create();
-
-            retrofit = new Retrofit.Builder()
-                    .baseUrl("http://203.255.81.72:10021//")
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .build();
-
-            comm_data service = retrofit.create(comm_data.class);
-            Call<String> call = null;
-            final String[] callback = new String[1];
-
-            if (mainActivity.dust_sensorMac.contains(postjson.get_mac())) {
-                call = service.sensing(postjson.get_sensor(),
-                        postjson.get_mode(),
-                        postjson.get_mac(),
-                        postjson.get_receiver(),
-                        postjson.get_time(),
-                        postjson.get_otp(),
-                        postjson.get_key(),
-                        postjson.get_data());
-
+    BroadcastReceiver mBluetoothSearchReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent){
+            String action = intent.getAction();
+            switch(action){
+                case BluetoothAdapter.ACTION_DISCOVERY_STARTED:
+                    dataDevice.clear();
+                    Toast.makeText(mainActivity.getApplicationContext(),"Start bluetooth searching", Toast.LENGTH_SHORT ).show();
+                    break;
+                case BluetoothDevice.ACTION_FOUND:
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    Map map = new HashMap();
+                    map.put("name", device.getName());
+                    map.put("address", device.getAddress());
+                    dataDevice.add(map);
+                    adapterDevice.notifyDataSetChanged();
+                    break;
+                case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
+                    Toast.makeText(mainActivity.getApplicationContext(),"Stop bluetooth searching", Toast.LENGTH_SHORT ).show();
+                    btnSearch.setEnabled(true);
             }
+        }
+    };
 
-            if (mainActivity.air_sensorMac.contains(postjson.get_mac())) {
-                call = service.sensing(postjson.get_sensor(),
-                        postjson.get_mode(),
-                        postjson.get_mac(),
-                        postjson.get_receiver(),
-                        postjson.get_time(),
-                        postjson.get_otp(),
-                        postjson.get_key(),
-                        postjson.get_data());
-
-            }
-}
+    }
 

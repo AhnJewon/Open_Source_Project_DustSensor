@@ -33,7 +33,7 @@ public class postdata {
     private String data;
 
 
-    public void set_data(String sensor, String mode, String mac, String receiver, String time, String otp,String key, String data) {
+    public void set_data(String sensor, String mode, String mac, String receiver, String time, String otp, String key, String data) {
         this.sensor = sensor;
         this.mode = mode;
 
@@ -50,22 +50,27 @@ public class postdata {
     public String get_sensor() {
     return sensor;
     }
+    public void set_sensor(String sensor){this.sensor = sensor;}
     public String get_mac() {
         return mac;
     }
+    public void set_mac(String mac){this.mac = mac;}
     public String get_receiver() {
         return receiver;
     }
+    public void set_receiver(String receiver){this.receiver = receiver;}
     public String get_time() {return time;}
+    public void set_time(String time){this.time = time;}
     public String get_otp() {
         return otp;
     }
-
+    public void set_otp(String otp){this.otp = otp;}
     public String get_key() {return key; }
-
+    public void set_key(String key){this.key = key;}
     public String get_data() {return data; }
-
+    public void set_data(String data){this.data = data;}
     public String get_mode() { return mode; }
+    public void set_mode(String mode){this.mode = mode;}
 }
 
 
