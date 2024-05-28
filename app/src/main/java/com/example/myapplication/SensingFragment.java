@@ -410,26 +410,24 @@ public class SensingFragment extends Fragment {
 
                     Toast.makeText(mainActivity.getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
                 } else {
+                    ed_pm0_1.setText(postdata.get_data());
                     String text3;
                     if (Integer.parseInt(postdata.get_data()) >= 0 && Integer.parseInt(postdata.get_data()) <= 50) {
                         ed_pm0_1.setTextColor(Color.parseColor("#549FF8"));
-                        text3 = "공기질 좋음";
+                        text3 = "공기질 좋음 : 오늘은 야외활동 어떠신가요?";
                     }
                     else if (Integer.parseInt(postdata.get_data()) <= 100) {
                         ed_pm0_1.setTextColor(Color.parseColor("#52C148"));
-                        text3 = "공기질 보통";
-                    } else if (Integer.parseInt(postdata.get_data()) <= 150) {
-                        ed_pm0_1.setTextColor(Color.parseColor("#EE9D62"));
-                        text3 = "공기질 민감군에 나쁨";
-                    } else if (Integer.parseInt(postdata.get_data()) <= 200) {
+                        text3 = "공기질 보통 : 오늘은 메타세콰이어길에서 피크닉 한번?! ";
+
+                    } else if (Integer.parseInt(postdata.get_data()) <= 250) {
                         ed_pm0_1.setTextColor(Color.parseColor("#EC655F"));
-                        text3 = "공기질 나쁨";
-                    } else if (Integer.parseInt(postdata.get_data()) <= 300) {
+                        text3 = "공기질 나쁨 : 오늘은 도서관에서 공부합시다ㅜ ";
+                    } else
+                    {
                         ed_pm0_1.setTextColor(Color.parseColor("#7E0023"));
-                        text3 = "공기질 매우 나쁨";
-                    } else {
-                        ed_pm0_1.setTextColor(Color.parseColor("#8F3F97"));
-                        text3 = "공기질 위험";
+                        text3 = " 공기질 매우 나쁨 : 이불 안이 최고야~ ";
+
                     }
                     Toast.makeText(mainActivity.getApplicationContext(), text3, Toast.LENGTH_LONG).show();
 
