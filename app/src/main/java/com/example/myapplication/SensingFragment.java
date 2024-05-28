@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Environment;
 import android.util.Log;
@@ -25,6 +26,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import android.widget.ImageView
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -408,7 +410,8 @@ public class SensingFragment extends Fragment {
                         text2 = "미세먼지 매우 나쁨";
                     }
 
-                    Toast.makeText(mainActivity.getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
+
+
                 } else {
                     ed_pm0_1.setText(postdata.get_data());
                     String text3;
@@ -444,6 +447,7 @@ public class SensingFragment extends Fragment {
 
         }
     };
+
 
 
 
