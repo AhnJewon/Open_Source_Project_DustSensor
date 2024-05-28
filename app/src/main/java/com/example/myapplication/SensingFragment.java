@@ -26,7 +26,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.ImageView
+import android.widget.ImageView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
