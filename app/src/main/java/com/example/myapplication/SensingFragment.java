@@ -410,6 +410,7 @@ public class SensingFragment extends Fragment {
 
                     Toast.makeText(mainActivity.getApplicationContext(), text1 + "\n" + text2, Toast.LENGTH_LONG).show();
                 } else {
+                    ed_pm0_1.setText(postdata.get_data());
                     String text3;
                     if (Integer.parseInt(postdata.get_data()) >= 0 && Integer.parseInt(postdata.get_data()) <= 50) {
                         ed_pm0_1.setTextColor(Color.parseColor("#549FF8"));
