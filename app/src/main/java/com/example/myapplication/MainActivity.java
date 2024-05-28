@@ -4,37 +4,25 @@ package com.example.myapplication;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.AdapterView;
-import android.media.AudioAttributes;
-import android.media.SoundPool;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.myapplication.databinding.ActivityMainBinding;
@@ -44,16 +32,8 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -74,31 +54,14 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding ma_binding;
     private SensingLayoutBinding se_binding;
     private ActivityMainBinding binding;
+    private String key;
 
 
-    String id;
-
-    List<String> mac1jo = new ArrayList<>(Arrays.asList("D8:3A:DD:42:AC:7F", "D8:3A:DD:42:AC:64",
-            "B8:27:EB:DA:F2:5B", "B8:27:EB:0C:F3:83"));
-    List<String> mac2jo = new ArrayList<>(Arrays.asList("D8:3A:DD:79:8F:97", "D8:3A:DD:79:8F:B9",
-            "D8:3A:DD:79:8F:54", "D8:3A:DD:79:8F:80"));
-    List<String> mac3jo = new ArrayList<>(Arrays.asList("D8:3A:DD:79:8E:D9", "D8:3A:DD:42:AC:9A",
-            "D8:3A:DD:42:AB:FB", "D8:3A:DD:79:8E:9B"));
-    List<String> mac4jo = new ArrayList<>(Arrays.asList("D8:3A:DD:78:A7:1A", "D8:3A:DD:79:8E:BF",
-            "D8:3A:DD:79:8E:92", "D8:3A:DD:79:8F:59"));
-    List<String> mac5jo = new ArrayList<>(Arrays.asList("B8:27:EB:47:8D:50", "B8:27:EB:D3:40:06",
-            "B8:27:EB:E4:D0:FC", "B8:27:EB:57:71:7D"));
-
-    List<String> dust_sensorMac = new ArrayList<>(Arrays.asList("D8:3A:DD:42:AC:7F", "D8:3A:DD:42:AC:64",
-            "B8:27:EB:DA:F2:5B", "B8:27:EB:0C:F3:83"));
-
-    List<String> air_sensorMac = new ArrayList<>(Arrays.asList("D8:3A:DD:C1:89:2E", "D8:3A:DD:C1:88:DD",
-            "D8:3A:DD:C1:89:1E", "D8:3A:DD:C1:88:99"));
-
-
+    private String id;
 
     ViewPager2Adapter viewPager2Adapter
             = new ViewPager2Adapter(getSupportFragmentManager(), getLifecycle());
+    ViewPager2 viewPager2;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -118,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         tab = ma_binding.tab;
 
-        ViewPager2 viewPager2 = ma_binding.pager;
+        viewPager2 = ma_binding.pager;
+
         viewPager2.setAdapter(viewPager2Adapter);
 
         viewPager2.setPageTransformer(new ZoomOutTransformer());
@@ -209,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     public void start() throws InterruptedException{
         Log.i("wifi", "Start");
 
@@ -256,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     Log.i("wifiResponse", response.body().toString());
+                    key = response.body().toString();
                 }
 
                 @Override
@@ -267,6 +233,15 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    public Retrofit get_retrofit(){
+        return retrofit;
+    }
+    public String getLocation(){
+        return key;
+    }
+    public  String getId(){
+        return id;
+    }
 
 }
 

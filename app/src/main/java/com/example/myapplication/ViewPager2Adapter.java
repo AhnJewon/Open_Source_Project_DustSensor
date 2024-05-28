@@ -18,10 +18,12 @@ public class ViewPager2Adapter extends FragmentStateAdapter {
         switch (position) {
             case 0:
                 return new SensingFragment();
-             case 1:
-                return new MapFragment();
-            case 2:
+            case 1:
                 return new ConnectionFragment();
+            case 2:
+                return new WebViewFragment();
+            case 3:
+                return new MapFragment();
             default:
                 return null;
         }
@@ -29,6 +31,6 @@ public class ViewPager2Adapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3;       // 페이지 수
+        return 4;       // 페이지 수
     }
 }

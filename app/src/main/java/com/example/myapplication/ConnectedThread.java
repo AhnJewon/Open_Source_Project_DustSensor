@@ -1,7 +1,10 @@
 package com.example.myapplication;
 
 
+import static android.app.PendingIntent.getActivity;
+
 import android.bluetooth.BluetoothSocket;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -10,12 +13,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 public class ConnectedThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
+    private postdata postdata = new postdata();
+    private MacAddress macAddress = new MacAddress();
+    private Retrofit retrofit;
 
-    public ConnectedThread(BluetoothSocket socket) {
+    MainActivity mainActivity;
+
+    public ConnectedThread(BluetoothSocket socket, MainActivity mainActivity) {
         mmSocket = socket;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
@@ -30,6 +43,8 @@ public class ConnectedThread extends Thread {
 
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
+
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -51,29 +66,41 @@ public class ConnectedThread extends Thread {
                     String data = new String(buffer, StandardCharsets.UTF_8);
                     Log.e("data", data);
 
-                    String pm = "", time = "", timeotp = "", mac = "";
+                    String pm , time, timeotp , mac , key;
 
                     int index = data.indexOf("!");
                     pm = data.substring(0, index);
                     data = data.substring(index +1);
-                    time = data.substring(0, 10);
-                    data = data.substring(11);
+
+                    index = data.indexOf("!");
+                    time = data.substring(0, index);
+                    data = data.substring(index+1);
 
                     index = data.indexOf("!");
                     timeotp = data.substring(0, index);
                     data = data.substring(index+1);
                     mac = data.substring(0,17);
 
+                    mainActivity.start();
+                    key = mainActivity.getLocation();
+                    postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, "1-2", pm);
+
+
                     Log.i("PM", pm);
                     Log.i("Time", time);
                     Log.i("TimeOTP", timeotp);
                     Log.i("Mac", mac);
+
+                    sendData(postdata);
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
 
                 break;
+            }
+            catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -96,27 +123,56 @@ public class ConnectedThread extends Thread {
         }
     }
 
-    //private String 함수명(byte[] sb) {
-//        String pass = sb.toString();
-//        Log.i("Pass", pass);
-//
-//        String time = "", timeotp = "", mac = "";
-//
-//        int index = pass.indexOf("!");
-//        if (index != -1) {
-//            pm = pass.substring(0, index-1);
-//            pass = pass.substring(index +1);
-//            time = pass.substring(0, 10);
-//            pass = pass.substring(11);
-//            timeotp = pass.substring(0,4);
-//            pass = pass.substring(5);
-//            mac = pass.substring(0)
+    private Boolean sendData(postdata postjson) {
 
-//            Log.i("Time", time);
-//            Log.i("TimeOTP", timeotp);
-//            Log.i("Mac", mac);
-//        }
-//pm1.0/pm2.5/pm10.0!time!timeotp!mac 주소
-//
-//Ex. 8/9/10!1798108442!1234!B8:AC:24:55:66:EE
+        {
+
+            retrofit = mainActivity.get_retrofit();
+
+            comm_data service = retrofit.create(comm_data.class);
+            Call<String> call = null;
+            final String[] callback = new String[1];
+
+            if (postjson.get_data().contains("/")) {
+                call = service.sensing(postjson.get_sensor(),
+                        postjson.get_mode(),
+                        postjson.get_mac(),
+                        postjson.get_receiver(),
+                        postjson.get_time(),
+                        postjson.get_otp(),
+                        postjson.get_key(),
+                        postjson.get_data());
+
+            }
+
+            else {
+                call = service.air_sensing(postjson.get_sensor(),
+                        postjson.get_mode(),
+                        postjson.get_mac(),
+                        postjson.get_receiver(),
+                        postjson.get_time(),
+                        postjson.get_otp(),
+                        postjson.get_key(),
+                        postjson.get_data());
+
+            }
+
+            call.enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    Log.e("test", response.body().toString());
+
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                }
+
+
+            });
+
+
+            return true;
+        }
+    }
 }

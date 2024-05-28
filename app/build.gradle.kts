@@ -30,7 +30,9 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
 }
+
 
 dependencies {
 
@@ -39,6 +41,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.naver.maps:map-sdk:3.18.0")
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation ("androidx.appcompat:appcompat:1.0.0")
 
 
     implementation(libs.appcompat)
