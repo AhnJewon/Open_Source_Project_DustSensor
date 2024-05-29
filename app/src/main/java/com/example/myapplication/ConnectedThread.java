@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -84,8 +85,10 @@ public class ConnectedThread extends Thread {
                     mac = data.substring(0,17);
 
                     mainActivity.start();
+                    while(mainActivity.getLocation() == null){}
                     key = mainActivity.getLocation();
-                    postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, "1-3", pm);
+                    mainActivity.setLocation(null);
+                    postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, key, pm);
 
                     Log.i("jo", postdata.get_sensor());
                     Log.i("PM", pm);
@@ -93,7 +96,7 @@ public class ConnectedThread extends Thread {
                     Log.i("TimeOTP", timeotp);
                     Log.i("Mac", mac);
 
-                    sendData(postdata);
+                    if(!Objects.equals(postdata.get_key(), "Localization Error")){sendData(postdata);}
                 }
 
             } catch (IOException e) {

@@ -35,6 +35,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -357,11 +358,12 @@ public class SensingFragment extends Fragment {
 
                 try {
                     mainActivity.start();
+                    while(mainActivity.getLocation() == null){}
                     postdata.set_key(mainActivity.getLocation());
+                    mainActivity.setLocation(null);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                postdata.set_key("1-1");
 
                 ed_sens.setText(postdata.get_sensor() + "/" + postdata.get_key());
                 ed_mac.setText(MacAdd);
@@ -459,7 +461,7 @@ public class SensingFragment extends Fragment {
 
                 datalist.add(ble);
 
-                sendData(postdata);
+                if(!Objects.equals(postdata.get_key(), "Localization Error")){sendData(postdata);}
 
 
             }
@@ -518,23 +520,6 @@ public class SensingFragment extends Fragment {
             });
         }
     }
-
-    private void setAir(){
-        pm01.setText("AirQ");
-
-
-//        params.weight = 2f;
-//        layout1.setLayoutParams(params);
-//
-//        params.weight = 1.5f;
-//        ed_rcv.setLayoutParams(params);
-//        ed_pm0_1.setLayoutParams(params);
-//
-//        params.weight = 0.5f;
-//        rcv.setLayoutParams(params);
-//        pm01.setLayoutParams(params);
-    }
-
 
     /* private String bytearrayToHex(byte[] scanRecord) {
         StringBuilder sb = new StringBuilder(scanRecord.length * 2);

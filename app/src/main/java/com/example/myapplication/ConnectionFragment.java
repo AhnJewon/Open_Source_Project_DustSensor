@@ -75,6 +75,12 @@ public class ConnectionFragment extends Fragment {
     }
 
     @Override
+    public void onDetach(){
+        super.onDetach();
+        mainActivity = null;
+    }
+
+    @Override
     public void onDestroy(){
         mainActivity.unregisterReceiver(mBluetoothSearchReceiver);
         super.onDestroy();
@@ -153,6 +159,7 @@ public class ConnectionFragment extends Fragment {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+
                 textStatus.setText(mainActivity.getLocation());
             }
 
