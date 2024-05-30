@@ -85,9 +85,7 @@ public class ConnectedThread extends Thread {
                     mac = data.substring(0,17);
 
                     mainActivity.start();
-                    while(mainActivity.getLocation() == null){}
                     key = mainActivity.getLocation();
-                    mainActivity.setLocation(null);
                     postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, key, pm);
 
                     Log.i("jo", postdata.get_sensor());

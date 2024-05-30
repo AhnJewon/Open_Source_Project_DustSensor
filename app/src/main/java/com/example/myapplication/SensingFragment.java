@@ -358,9 +358,7 @@ public class SensingFragment extends Fragment {
 
                 try {
                     mainActivity.start();
-                    while(mainActivity.getLocation() == null){}
                     postdata.set_key(mainActivity.getLocation());
-                    mainActivity.setLocation(null);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -508,7 +506,7 @@ public class SensingFragment extends Fragment {
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
-                    Log.e("test", response.body().toString());
+                    if(response.body() != null){Log.e("test", response.body().toString());}
 
                 }
 
