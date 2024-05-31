@@ -8,10 +8,13 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -83,15 +86,15 @@ public class ConnectedThread extends Thread {
 
                     mainActivity.start();
                     key = mainActivity.getLocation();
-                    postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, "1-2", pm);
+                    postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, key, pm);
 
-
+                    Log.i("jo", postdata.get_sensor());
                     Log.i("PM", pm);
                     Log.i("Time", time);
                     Log.i("TimeOTP", timeotp);
                     Log.i("Mac", mac);
 
-                    sendData(postdata);
+                    if(!Objects.equals(postdata.get_key(), "Localization Error")){sendData(postdata);}
                 }
 
             } catch (IOException e) {
@@ -160,7 +163,7 @@ public class ConnectedThread extends Thread {
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
-                    Log.e("test", response.body().toString());
+                    if(response.body() != null){Log.e("test", response.body().toString());}
 
                 }
 

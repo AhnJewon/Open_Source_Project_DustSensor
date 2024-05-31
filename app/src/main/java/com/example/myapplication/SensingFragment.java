@@ -35,6 +35,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -320,7 +321,7 @@ public class SensingFragment extends Fragment {
         if(!tbt_change.isChecked()){
             for(int i=index+2; i<index+8; i+=2){
                 sb.append(Integer.parseInt(scan.substring(i,i+2),16));
-                sb.append("/");
+                if(i<index+6){sb.append("/");}
             }
             postdata.set_data(sb.toString());
         } else {
@@ -361,7 +362,6 @@ public class SensingFragment extends Fragment {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                postdata.set_key("1-1");
 
                 ed_sens.setText(postdata.get_sensor() + "/" + postdata.get_key());
                 ed_mac.setText(MacAdd);
@@ -459,7 +459,7 @@ public class SensingFragment extends Fragment {
 
                 datalist.add(ble);
 
-                sendData(postdata);
+                if(!Objects.equals(postdata.get_key(), "Localization Error")){sendData(postdata);}
 
 
             }
@@ -506,7 +506,7 @@ public class SensingFragment extends Fragment {
             call.enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
-                    Log.e("test", response.body().toString());
+                    if(response.body() != null){Log.e("test", response.body().toString());}
 
                 }
 
@@ -518,23 +518,6 @@ public class SensingFragment extends Fragment {
             });
         }
     }
-
-    private void setAir(){
-        pm01.setText("AirQ");
-
-
-//        params.weight = 2f;
-//        layout1.setLayoutParams(params);
-//
-//        params.weight = 1.5f;
-//        ed_rcv.setLayoutParams(params);
-//        ed_pm0_1.setLayoutParams(params);
-//
-//        params.weight = 0.5f;
-//        rcv.setLayoutParams(params);
-//        pm01.setLayoutParams(params);
-    }
-
 
     /* private String bytearrayToHex(byte[] scanRecord) {
         StringBuilder sb = new StringBuilder(scanRecord.length * 2);

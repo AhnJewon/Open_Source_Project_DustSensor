@@ -158,7 +158,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void onDestroy(){
+        unregisterReceiver(rssiReceiver);
+        super.onDestroy();
+    }
 
     private class ZoomOutTransformer implements ViewPager2.PageTransformer {
         private static final float MIN_SCALE = 0.85f;
@@ -197,9 +201,13 @@ public class MainActivity extends AppCompatActivity {
 
         wifidata="";
 
+        registerReceiver(rssiReceiver, new IntentFilter((WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)));
+        registerReceiver(rssiReceiver, new IntentFilter((WifiManager.RSSI_CHANGED_ACTION)));
+
         if(!wifiman.startScan()){
             Log.e("wifiScan1", "wifi scan fail!");
         }
+
 
     }
 
@@ -209,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
             boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
             if(success){
                 scanSuccess();
+                unregisterReceiver(rssiReceiver);
             }else{
                 Log.e("wifiScan2","wifi scan fail!");
             }
@@ -238,6 +247,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<String> call, Response<String> response) {
                     Log.i("wifiResponse", response.body().toString());
                     key = response.body().toString();
+
                 }
 
                 @Override
@@ -255,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
     public String getLocation(){
         return key;
     }
+    public void setLocation(String a){key = a;}
     public  String getId(){
         return id;
     }
