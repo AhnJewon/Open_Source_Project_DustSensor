@@ -6,4 +6,5 @@
     <color name="background">#FFFFFFFF</color>
     <color name="gray">#404040</color>
     <color name="lightgray">#FFB1B1B1</color>
+    <color name="blackv2">#FF000000</color>
 </resources>

@@ -29,7 +29,7 @@ public class ConnectedThread extends Thread {
     private MacAddress macAddress = new MacAddress();
     private Retrofit retrofit;
 
-    MainActivity mainActivity;
+    private MainActivity mainActivity;
 
     public ConnectedThread(BluetoothSocket socket, MainActivity mainActivity) {
         mmSocket = socket;
@@ -68,7 +68,7 @@ public class ConnectedThread extends Thread {
                     bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
                     String data = new String(buffer, StandardCharsets.UTF_8);
                     Log.e("data", data);
-
+                    mainActivity.start();
                     String pm , time, timeotp , mac , key;
 
                     int index = data.indexOf("!");
@@ -84,7 +84,7 @@ public class ConnectedThread extends Thread {
                     data = data.substring(index+1);
                     mac = data.substring(0,17);
 
-                    mainActivity.start();
+
                     key = mainActivity.getLocation();
                     postdata.set_data(macAddress.witchJo(mac), "connection", mac, mainActivity.getId(), time, timeotp, key, pm);
 

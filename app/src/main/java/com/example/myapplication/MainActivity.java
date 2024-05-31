@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.icu.text.SimpleDateFormat;
 import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -33,6 +34,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.lang.reflect.Field;
+import java.sql.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -63,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
     ViewPager2Adapter viewPager2Adapter
             = new ViewPager2Adapter(getSupportFragmentManager(), getLifecycle());
     ViewPager2 viewPager2;
+    private long mNow;
+    private Date mDate;
+    private SimpleDateFormat mFormat = new SimpleDateFormat("HH");
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -201,9 +207,6 @@ public class MainActivity extends AppCompatActivity {
 
         wifidata="";
 
-        registerReceiver(rssiReceiver, new IntentFilter((WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)));
-        registerReceiver(rssiReceiver, new IntentFilter((WifiManager.RSSI_CHANGED_ACTION)));
-
         if(!wifiman.startScan()){
             Log.e("wifiScan1", "wifi scan fail!");
         }
@@ -217,7 +220,6 @@ public class MainActivity extends AppCompatActivity {
             boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
             if(success){
                 scanSuccess();
-                unregisterReceiver(rssiReceiver);
             }else{
                 Log.e("wifiScan2","wifi scan fail!");
             }

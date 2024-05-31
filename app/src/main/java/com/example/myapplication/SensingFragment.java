@@ -325,9 +325,8 @@ public class SensingFragment extends Fragment {
             }
             postdata.set_data(sb.toString());
         } else {
-            for(int i=index+2; i<index+6; i+=2){
-                sb.append(Integer.parseInt(scan.substring(i,i+2),16));
-            }
+            if(Integer.parseInt(scan.substring(index+2,index+4),16)!=0){sb.append(Integer.parseInt(scan.substring(index+2,index+4),16));}
+            sb.append(String.format("%02d",Integer.parseInt(scan.substring(index+4,index+6),16)));
             postdata.set_data(sb.toString());
         }
         Log.i("data", sb.toString());
@@ -347,6 +346,12 @@ public class SensingFragment extends Fragment {
 
             if (macAddress.isContain(MacAdd) && (macAddress.isAir(MacAdd)==tbt_change.isChecked())) {
                 Log.i("ble", "스캔됨");
+                try {
+                    mainActivity.start();
+                    postdata.set_key(mainActivity.getLocation());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 byteToHex(scanRecord);
 
                 postdata.set_sensor(macAddress.witchJo(MacAdd));
@@ -356,13 +361,7 @@ public class SensingFragment extends Fragment {
                 //blead.stopLeScan(scancallback_le);
                 //sw_bt.setChecked(false);
 
-                try {
-                    mainActivity.start();
-                    postdata.set_key(mainActivity.getLocation());
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
+                postdata.set_key(mainActivity.getLocation());
                 ed_sens.setText(postdata.get_sensor() + "/" + postdata.get_key());
                 ed_mac.setText(MacAdd);
                 ed_time.setText(postdata.get_time());
@@ -370,14 +369,15 @@ public class SensingFragment extends Fragment {
                 ed_rcv.setText(postdata.get_receiver());
 
                 int iconResId1, iconResId2;
+                String[] pm = postdata.get_data().split("/");
 
+                BLEdata_storage ble = new BLEdata_storage(postdata.get_sensor(), postdata.get_mode(), postdata.get_mac(), postdata.get_time(), postdata.get_otp(), postdata.get_receiver(), postdata.get_data(), postdata.get_key());
 
+                datalist.add(ble);
 
-
-
+                if(!Objects.equals(postdata.get_key(), "Localization Error")){sendData(postdata);}
 
                 if(!tbt_change.isChecked()) {
-                    String[] pm = postdata.get_data().split("/");
                     ed_pm0_1.setText(pm[0]);
                     ed_pm25.setText(pm[1]);
                     ed_pm10.setText(pm[2]);
@@ -454,13 +454,6 @@ public class SensingFragment extends Fragment {
 
 
                 }
-
-                BLEdata_storage ble = new BLEdata_storage(postdata.get_sensor(), postdata.get_mode(), postdata.get_mac(), postdata.get_time(), postdata.get_otp(), postdata.get_receiver(), postdata.get_data(), postdata.get_key());
-
-                datalist.add(ble);
-
-                if(!Objects.equals(postdata.get_key(), "Localization Error")){sendData(postdata);}
-
 
             }
 

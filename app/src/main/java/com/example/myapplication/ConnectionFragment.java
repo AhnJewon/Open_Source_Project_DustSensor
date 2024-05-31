@@ -7,10 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -48,25 +50,23 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ConnectionFragment extends Fragment {
 
-    String TAG = "MainActivity";
-    UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private String TAG = "MainActivity";
+    private  UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    TextView textStatus;
-    Button btnParied, btnSearch, btnSend;
-    ListView listView;
-    ListView listview2;
-    private postdata postdata;
-    BluetoothAdapter btAdapter;
-    Set<BluetoothDevice> pairedDevices;
-    ArrayAdapter<String> btArrayAdapter;
-    ArrayList<String> deviceAddressArray;
+    private TextView textStatus;
+    private Button btnParied, btnSearch, btnSend;
+    private ListView listView;
+    private BluetoothAdapter btAdapter;
+    private Set<BluetoothDevice> pairedDevices;
+    private ArrayAdapter<String> btArrayAdapter;
+    private ArrayList<String> deviceAddressArray;
 
     private final static int REQUEST_ENABLE_BT = 1;
-    BluetoothSocket btSocket = null;
-    ConnectedThread connectedThread;
+    private BluetoothSocket btSocket = null;
+    private ConnectedThread connectedThread;
     private List<Map<String,String>> dataDevice;
-    SimpleAdapter adapterDevice;
-    MainActivity mainActivity;
+    private SimpleAdapter adapterDevice;
+    private MainActivity mainActivity;
 
     @Override
     public void onAttach(Context context) {
@@ -91,7 +91,20 @@ public class ConnectionFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         dataDevice = new ArrayList<>();
-        adapterDevice = new SimpleAdapter(mainActivity.getApplicationContext(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"},new int[]{android.R.id.text1, android.R.id.text2});
+        adapterDevice = new SimpleAdapter(mainActivity.getApplicationContext(), dataDevice, android.R.layout.simple_list_item_2, new String[]{"name", "address"},new int[]{android.R.id.text1, android.R.id.text2}){
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text2 = (TextView) view.findViewById(android.R.id.text2);
+
+                text1.setTextColor(ContextCompat.getColor(mainActivity.getApplicationContext(), R.color.black));
+                text2.setTextColor(ContextCompat.getColor(mainActivity.getApplicationContext(), R.color.blackv2));
+
+                return view;
+            }
+        };
         btAdapter = mainActivity.blead;
         if (!btAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
