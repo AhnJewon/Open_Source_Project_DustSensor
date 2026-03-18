@@ -82,15 +82,15 @@ Open_Source_Project_DustSensor/
 로컬에서 아래 명령으로 단위 테스트를 실행할 수 있습니다.
 
 ```bash
-bash ./gradlew test
+./gradlew test
 ```
 
-> 참고: 네트워크/환경 제약에 따라 Gradle 플러그인 또는 의존성 해석이 실패할 수 있습니다.
+> 참고: `com.android.application` 플러그인 해석 오류가 발생하면 네트워크 상태를 확인하고, Android Studio에서 **Gradle Sync**를 다시 실행한 뒤 재시도하세요.
 
 ## 권한 및 유의사항
 
 - 앱은 블루투스, 위치, 네트워크, 저장소 권한을 사용합니다.
-- 서버/웹 URL은 현재 코드에 하드코딩되어 있으므로, 배포 환경에 맞는 값으로 조정이 필요할 수 있습니다.
+- 서버/웹 URL은 현재 코드에 하드코딩되어 있으므로, 운영 환경에서는 반드시 빌드 설정(`BuildConfig`/`gradle.properties`) 등 외부 설정으로 분리해 관리하는 것을 권장합니다.
 - `android:usesCleartextTraffic="true"` 설정을 사용하므로 운영 환경에서는 HTTPS 전환을 권장합니다.
 
 ## 라이선스
